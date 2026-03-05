@@ -21,5 +21,5 @@ Projet brickbreaker Victore / Liam.
             git status
             git add .
             git commit -m "Description courte"
-            git push.    
+            git push    
     }
