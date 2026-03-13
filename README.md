@@ -5,7 +5,7 @@ Projet brickbreaker Victore / Liam.
     {
         - avant de coder : 
         
-            git pull
+           git pull 
         
         - coder 
             .
