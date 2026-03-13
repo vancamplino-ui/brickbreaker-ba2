@@ -23,13 +23,5 @@ Projet brickbreaker Victore / Liam.
             git commit -m "Description courte"
             git push    
     }
-
-
-// feawgeg
-geawga
-gaewgvqwgv
-ewasfwF
-Wgqewrqegw
-dQEWFQEW
-
+ 
 
