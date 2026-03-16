@@ -75,7 +75,24 @@ Exemples d'utilisation utiles :
 Cela permet de centraliser toute la geometrie dans `tools` et d'eviter de dupliquer des calculs dans plusieurs fichiers.
 
 
+## include : 
 
+    attention au include surtout pour tools.h et constants.h pcq ils se trouve dans un autre dossier donc --> 
+
+        {
+            #include "../tools/tools.h"
+            #include "../tools/constants.h"
+        }
+
+
+
+
+## lundi 16.03 
+    -  j'ai finalisé 2-3 fonctions dans tools mais il n'est pas fini a 100% dit moi si tu as besoin d'autres fonctions
+    -  j'ai commencer paddle et mis certaines de réstriction lié seulement a paddle et a l'arène donc il me reste a faire celles liée a l'intersection entre une balle et la raquette   ou la raquette et une brique 
+
+    - j'ai fait deux trois teste et ajouter un dossier ou ranger nos teste comme ca on copie colle ca dans main lors que l'on veut tester. 
+    
 ## Workflow git
 
 A faire a chaque fois :

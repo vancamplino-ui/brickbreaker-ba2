@@ -1,0 +1,50 @@
+game.h
+
+#ifndef GAME_H
+#define GAME_H
+
+#include "paddle.h"
+
+class Game
+{
+public:
+    Game();
+    Game(Paddle paddle);
+
+    void setPaddle(Paddle paddle);
+    bool testPaddle() const;
+
+private:
+    Paddle paddle;
+};
+
+#endif
+
+
+
+game.cc
+
+#include "game.h"
+
+Game::Game()
+    : paddle()
+{
+}
+
+Game::Game(Paddle paddle)
+    : paddle(paddle)
+{
+}
+
+void Game::setPaddle(Paddle paddle)
+{
+    this->paddle = paddle;
+}
+
+bool Game::testPaddle() const
+{
+    if (paddle.is_valid()) {
+        return true;
+    }
+    return false;
+}

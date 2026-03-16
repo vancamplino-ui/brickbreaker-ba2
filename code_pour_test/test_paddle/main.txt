@@ -1,0 +1,24 @@
+#include <iostream>
+
+#include "../model/paddle.h"
+#include "../model/message.h"
+
+int main()
+{
+    double x;
+    double y;
+    double r;
+
+    std::cin >> x >> y >> r;
+
+    Paddle paddle({x, y}, r);
+
+    if (!paddle.is_valid()) {
+        std::cout << message::paddle_outside(x, y);
+        return 1;
+    }
+
+    std::cout << "All good\n";
+
+    return 0;
+}

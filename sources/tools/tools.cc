@@ -29,43 +29,73 @@ Point normalized(Point p)
     return p / p_norm;
 }
 
+
 bool contains(Circle c, Point p)
 {
-    if (distance_carre(c.center, p) <= c.radius * c.radius) return true;
+    if (distance(c.center, p) < c.radius - epsil_zero) {
+        return true;
+    }
     return false;
 }
 
 bool contains(Square s, Point p)
 {
-    if (std::abs(p.x - s.center.x) <= s.half_size
-        && std::abs(p.y - s.center.y) <= s.half_size) return true;
+    double xmin(s.center.x - s.half_size);
+    double xmax(s.center.x + s.half_size);
+    double ymin(s.center.y - s.half_size);
+    double ymax(s.center.y + s.half_size);
+
+    if (p.x > xmin + epsil_zero && p.x < xmax - epsil_zero
+        && p.y > ymin + epsil_zero && p.y < ymax - epsil_zero) {
+        return true;
+    }
     return false;
 }
 
 bool intersects(Circle c1, Circle c2)
 {
-    double radius_sum(c1.radius + c2.radius);
+    double d(distance(c1.center, c2.center));
+    double gap(d - (c1.radius + c2.radius));
 
-    if (distance_carre(c1.center, c2.center) <= radius_sum * radius_sum) return true;
+    if (gap < epsil_zero) {
+        return true;
+    }
     return false;
 }
 
 bool intersects(Square s1, Square s2)
 {
-    if (std::abs(s1.center.x - s2.center.x) <= s1.half_size + s2.half_size
-        && std::abs(s1.center.y - s2.center.y) <= s1.half_size + s2.half_size) return true;
+    double dx(std::abs(s1.center.x - s2.center.x)
+              - (s1.half_size + s2.half_size));
+    double dy(std::abs(s1.center.y - s2.center.y)
+              - (s1.half_size + s2.half_size));
+
+    double gap_x(std::max(dx, 0.0));
+    double gap_y(std::max(dy, 0.0));
+
+    double min_dist(std::sqrt(gap_x * gap_x + gap_y * gap_y));
+
+    if (min_dist < epsil_zero) {
+        return true;
+    }
     return false;
 }
 
 bool intersects(Circle c, Square s)
 {
-    Point min {s.center.x - s.half_size, s.center.y - s.half_size};
-    Point max {s.center.x + s.half_size, s.center.y + s.half_size};
-    Point closest {
+    Point min{s.center.x - s.half_size, s.center.y - s.half_size};
+    Point max{s.center.x + s.half_size, s.center.y + s.half_size};
+
+    Point closest{
         std::clamp(c.center.x, min.x, max.x),
-        std::clamp(c.center.y, min.y, max.y),
+        std::clamp(c.center.y, min.y, max.y)
     };
 
-    if (distance_carre(c.center, closest) <= c.radius * c.radius) return true;
+    double d(distance(c.center, closest));
+    double gap(d - c.radius);
+
+    if (gap < epsil_zero) {
+        return true;
+    }
     return false;
 }

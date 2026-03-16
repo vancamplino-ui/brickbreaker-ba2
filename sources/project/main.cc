@@ -1,8 +1,12 @@
 #include <iostream>
 
-int main(int argc, char* argv[])
+#include "../model/game.h"
+
+int main()
 {
-    std::cout << "Hello, World!" << std::endl;
-   
+    Game game;
+
+    std::cout << "All good" << std::endl;
+
     return 0;
 }
