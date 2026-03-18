@@ -1,6 +1,6 @@
 # brickbreaker-ba2
 
-Projet de Brick Breaker realise par Victore et Liam dans le cadre du cours ICC 2.
+Projet de Brick Breaker realise par Victor et Liam dans le cadre du cours ICC 2.
 
 
 
