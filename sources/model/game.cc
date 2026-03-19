@@ -78,7 +78,7 @@ namespace {
 }
 
 Game::Game()
-    : score(0), lives(0), paddle(), bricks(), balls()
+    : score(0), lives(0), paddle(), balls(), bricks()
 {
 }
 
@@ -89,9 +89,6 @@ bool Game::load(std::string const& filename)
     if (!file) {
         return false;
     }
-
-    int tmp_score = 0;
-    int tmp_lives = 0;
     double px = 0.0, py = 0.0, pr = 0.0;
 
     // read score
