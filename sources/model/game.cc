@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../tools/tools.h"
 #include "../tools/constants.h"
 #include <fstream>
 #include <string>
@@ -347,6 +348,72 @@ Game::Game()
 {
 }
 
+Game::~Game()
+{
+    for (auto b : bricks) delete b;
+}
+
+bool Game::check_bricks_collision()
+{
+    for (size_t i = 0; i < bricks.size(); ++i) {
+        for (size_t j = i + 1; j < bricks.size(); ++j) {
+            if (intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
+                std::cout << message::collision_bricks(i, j);
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Game::check_paddle_brick()
+{
+    for (size_t i = 0; i < bricks.size(); ++i) {
+        if (intersects(paddle.getArc(), bricks[i]->getBody())) {
+            std::cout << message::collision_paddle_brick(i);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Game::check_balls_collision()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        for (size_t j = i + 1; j < balls.size(); ++j) {
+            if (intersects(balls[i].getBody(), balls[j].getBody())) {
+                std::cout << message::collision_balls(i, j);
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Game::check_ball_brick()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        for (size_t j = 0; j < bricks.size(); ++j) {
+            if (intersects(balls[i].getBody(), bricks[j]->getBody())) {
+                std::cout << message::collision_ball_brick(i, j);
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Game::check_paddle_ball()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        if (intersects(paddle.getArc(), balls[i].getBody())) {
+            std::cout << message::collision_paddle_ball(i);
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Game::load(std::string const& filename)
 {
     std::ifstream file(filename);   
@@ -363,5 +430,12 @@ bool Game::load(std::string const& filename)
     if (!read_bricks(file, bricks)) return false;
     if (!read_balls(file, balls)) return false;
 
+    if (!check_bricks_collision()) return false;
+    if (!check_paddle_brick()) return false;
+    if (!check_balls_collision()) return false;
+    if (!check_ball_brick()) return false;
+    if (!check_paddle_ball()) return false;
+
+    std::cout << message::success();
     return true;
 }
