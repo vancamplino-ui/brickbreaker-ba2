@@ -10,7 +10,7 @@ class Brick
 {
 public:
     // constructeur de la brique
-    Brick(Square body = {{0.0, 0.0}, 0.0});
+    Brick(Square body = {{0.0, 0.0}, 0.0}, BrickType type = RAINBOW);
  
     Square getBody() const;
     BrickType getType() const;
@@ -18,15 +18,14 @@ public:
     // contrôle des données fournies en entrée pour voir si la brique est valide ou pas
     bool is_inside_arena() const;
     bool is_size_valid() const;
-    bool is_valid() const;
+    virtual bool is_valid() const;
  
     virtual ~Brick() = default;
- 
-protected:
-    Brick(Square body, BrickType type);
 
+protected:
     Square body;
     BrickType type;
+
 };
  
 class RainbowBrick : public Brick
@@ -39,7 +38,7 @@ public:
  
     // vérifie que hit_points est bien dans [1, 7]
     bool is_hit_points_valid() const;
-    bool is_valid() const;
+    bool is_valid() const override;
  
 private:
     int hit_points;
@@ -58,5 +57,4 @@ public:
     // constructeur de la Split brick
     SplitBrick(Square body = {{0.0, 0.0}, 0.0});
 };
- 
-#endif
+#endif 

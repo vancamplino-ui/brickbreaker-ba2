@@ -7,6 +7,7 @@
 // Version 1.0 du 24.02.2025
 //
 
+#include <cstddef>
 #include <string>
 
 namespace message

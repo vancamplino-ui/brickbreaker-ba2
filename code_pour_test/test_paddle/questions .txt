@@ -1,0 +1,8 @@
+1: Est ce qu'on part du principe que les types des diffrentes valeures fournies sont juste ? 
+2: Dans quel ordre effectuer les tests ? 
+    - d'abord tester toutes les inclusion dans l'arène puis ensuite s'atarder sur brick, ball... 
+    - tester d'abord tout pour brick puis tout pour ball ? 
+    - faut-il tester si le nombre de brick ou de ball fournies est juste avant de faire les différents
+      tests car il n'y a pas de message d'erreur associé 
+    
+    - à l'intérieur de test brick il faut tester dans quel ordre ? j'imagine dans l'ordre de lecture 

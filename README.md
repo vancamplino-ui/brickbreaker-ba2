@@ -93,7 +93,22 @@ Cela permet de centraliser toute la geometrie dans `tools` et d'eviter de dupliq
 
     - j'ai fait deux trois teste et ajouter un dossier ou ranger nos teste comme ca on copie colle ca dans main lors que l'on veut tester. 
     
-## Workflow git
+## 🔧 Modifications Brick
+
+J’ai restructuré le module `brick` en utilisant l’héritage pour gérer les différents types de briques (`RainbowBrick`, `BallBrick`, `SplitBrick`). L’idée est d’avoir une classe de base `Brick` avec tout ce qui est commun (géométrie + type), puis des classes dérivées pour les comportements spécifiques (par exemple les points de vie pour `RainbowBrick`).
+
+J’ai aussi rendu `is_valid()` virtuelle pour pouvoir adapter les vérifications selon le type de brique. J’ai ajouté un destructeur virtuel pour éviter les problèmes de mémoire avec le polymorphisme.
+
+de plus : 
+{... 
+protected:
+    Square body;
+    BrickType type;
+};
+
+afin que ces deux type sois accessible par les "enfant", les sous classe de type de Brick.
+
+## 🔄 Workflow git
 
 A faire a chaque fois :
 
@@ -113,4 +128,3 @@ git add .
 git commit -m "Description courte"
 git push
 ```
- 
