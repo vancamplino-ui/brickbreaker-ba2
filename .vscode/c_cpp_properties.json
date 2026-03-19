@@ -3,8 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/net-snmp/library"
+                "${workspaceFolder}/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

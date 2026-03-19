@@ -23,6 +23,8 @@ public:
     virtual ~Brick() = default;
  
 protected:
+    Brick(Square body, BrickType type);
+
     Square body;
     BrickType type;
 };

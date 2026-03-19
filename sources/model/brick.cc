@@ -1,7 +1,8 @@
 #include "brick.h"
  
-Brick::Brick(Square body)
-    : body{body}, type{RAINBOW}
+
+Brick::Brick(Square body, BrickType type)
+    : body{body}, type{type}
 {
 }
  
@@ -46,9 +47,8 @@ bool Brick::is_valid() const
 }
  
 RainbowBrick::RainbowBrick(Square body, int hit_points)
-    : Brick{body}, hit_points{hit_points}
+    : Brick{body, RAINBOW}, hit_points{hit_points}
 {
-    type = RAINBOW;
 }
  
 int RainbowBrick::getHitPoints() const
@@ -71,13 +71,11 @@ bool RainbowBrick::is_valid() const
 }
  
 BallBrick::BallBrick(Square body)
-    : Brick{body}
+    : Brick{body, BALL}
 {
-    type = BALL;
 }
- 
+
 SplitBrick::SplitBrick(Square body)
-    : Brick{body}
+    : Brick{body, SPLIT}
 {
-    type = SPLIT;
 }
