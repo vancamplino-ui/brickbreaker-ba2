@@ -15,8 +15,6 @@ int main(int argc, char* argv[])
         // les messages d'erreur sont déjà affichés dans les fonctions read_*
         return 1;
     }
-
-    std::cout << "All good" << std::endl;
-
+    
     return 0;
 }
