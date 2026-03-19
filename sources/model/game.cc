@@ -344,13 +344,10 @@ namespace {
     bool intersects_strict(Square s1, Square s2)
     {
         double dx(std::abs(s1.center.x - s2.center.x)
-                  - (s1.half_size + s2.half_size));
+              - (s1.half_size + s2.half_size));
         double dy(std::abs(s1.center.y - s2.center.y)
-                  - (s1.half_size + s2.half_size));
-        double gap_x(std::max(dx, 0.0));
-        double gap_y(std::max(dy, 0.0));
-        double min_dist(std::sqrt(gap_x * gap_x + gap_y * gap_y));
-        if (min_dist <= 0.0) return true;
+              - (s1.half_size + s2.half_size));
+        if (dx < 0.0 && dy < 0.0) return true;
         return false;
     }
 
