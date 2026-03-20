@@ -108,6 +108,13 @@ protected:
 
 afin que ces deux type sois accessible par les "enfant", les sous classe de type de Brick.
 
+###
+make
+for i in $(seq -w 0 17); do
+    echo -n "t$i : "
+    ./project tests/t$i.txt
+done
+
 ## 🔄 Workflow git
 
 A faire a chaque fois :
