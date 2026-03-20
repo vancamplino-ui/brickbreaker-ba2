@@ -17,5 +17,9 @@
 ./project tests/t16.txt
 ./project tests/t17.txt
 
-
+make
+for i in $(seq -w 0 17); do
+    echo -n "t$i : "
+    ./project tests/t$i.txt
+done
 
