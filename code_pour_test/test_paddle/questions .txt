@@ -10,21 +10,4 @@
 2: ou placer les fichier teste pour que ca marche lors du rendu du projet 1 ? 
 
 
-./project tests/t00.txt
-./project tests/t01.txt
-./project tests/t02.txt
-./project tests/t03.txt
-./project tests/t04.txt
-./project tests/t05.txt
-./project tests/t06.txt
-./project tests/t07.txt
-./project tests/t08.txt
-./project tests/t09.txt
-./project tests/t10.txt
-./project tests/t11.txt
-./project tests/t12.txt
-./project tests/t13.txt
-./project tests/t14.txt
-./project tests/t15.txt
-./project tests/t16.txt
-./project tests/t17.txt
+

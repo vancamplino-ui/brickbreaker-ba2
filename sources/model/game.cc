@@ -87,10 +87,7 @@ namespace {
 
         nb_bricks = std::stoi(token);
 
-        if (nb_bricks < 0) {
-            return false;
-        }
-
+        if (nb_bricks < 0)  return false;
         return true;
     }
 
@@ -179,9 +176,8 @@ namespace {
             return false;
         }
 
-        if (!validate_brick(brick, x, y, c)) {
-            return false;
-        }
+        if (!validate_brick(brick, x, y, c)) return false;
+        
 
         bricks.push_back(brick);
         return true;
@@ -192,9 +188,7 @@ namespace {
         Square body = make_brick_body(x, y, c);
         BallBrick* brick = new BallBrick(body);
 
-        if (!validate_brick(brick, x, y, c)) {
-            return false;
-        }
+        if (!validate_brick(brick, x, y, c)) return false;
 
         bricks.push_back(brick);
         return true;
@@ -205,9 +199,7 @@ namespace {
         Square body = make_brick_body(x, y, c);
         SplitBrick* brick = new SplitBrick(body);
 
-        if (!validate_brick(brick, x, y, c)) {
-            return false;
-        }
+        if (!validate_brick(brick, x, y, c)) return false;
 
         bricks.push_back(brick);
         return true;
