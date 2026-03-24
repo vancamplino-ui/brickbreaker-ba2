@@ -56,12 +56,11 @@ double distance(Point a, Point b);
 Point normalized(Point p);
 
 
-// inclusion et intersection 
-bool contains(Circle c, Point p);
-bool contains(Square s, Point p);
+// inclusion et intersection
+bool is_inside(Circle c, Point p);
+bool is_inside(Square s, Point p);
 
 bool intersects(Circle c1, Circle c2);
 bool intersects(Square s1, Square s2);
 bool intersects(Circle c, Square s);
 #endif
-

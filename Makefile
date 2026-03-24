@@ -8,7 +8,6 @@ CXXFLAGS = -g -Wall -Wextra -pedantic -std=c++17
 CXXFILES = \
 	sources/project/main.cc \
 	sources/model/game.cc \
-	sources/model/game_reader.cc \
 	sources/model/ball.cc \
 	sources/model/brick.cc \
 	sources/model/paddle.cc \
@@ -18,7 +17,6 @@ CXXFILES = \
 OFILES = \
 	sources/project/main.o \
 	sources/model/game.o \
-	sources/model/game_reader.o \
 	sources/model/ball.o \
 	sources/model/brick.o \
 	sources/model/paddle.o \

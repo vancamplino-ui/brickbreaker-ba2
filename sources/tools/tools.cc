@@ -30,7 +30,7 @@ Point normalized(Point p)
 }
 
 
-bool contains(Circle c, Point p)
+bool is_inside(Circle c, Point p)
 {
     if (distance(c.center, p) < c.radius - epsil_zero) {
         return true;
@@ -38,7 +38,7 @@ bool contains(Circle c, Point p)
     return false;
 }
 
-bool contains(Square s, Point p)
+bool is_inside(Square s, Point p)
 {
     double xmin(s.center.x - s.half_size);
     double xmax(s.center.x + s.half_size);
