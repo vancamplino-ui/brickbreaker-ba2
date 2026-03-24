@@ -23,3 +23,32 @@ for i in $(seq -w 0 17); do
     ./project tests/t$i.txt
 done
 
+make
+for i in $(seq -w 0 17); do
+    fichier="tests/t$i.txt"
+    attendu=$(head -n 1 "$fichier" | sed -n 's/.*\"\(.*\)\".*/\1/p')
+    obtenu=$(./project "$fichier" 2>&1 |  tr -d '\n' )
+
+    if [ "$obtenu" = "$attendu" ]; then
+        echo "t$i : OK"
+    else
+        echo "t$i : FAIL"
+        echo "  attendu : [$attendu]"
+        echo "  obtenu  : [$obtenu]"
+    fi
+done
+
+for i in $(seq -w 0 17); do
+    fichier="tests/t$i.txt"
+
+    attendu=$(head -n 1 "$fichier" | sed -n 's/.*\[\(.*\)\].*/\1/p')
+    obtenu=$(./project "$fichier" | tr -d '\n')
+
+    if [ "$obtenu" = "$attendu" ]; then
+        echo "t$i : OK"
+    else
+        echo "t$i : FAIL"
+        echo "  attendu : [$attendu]"
+        echo "  obtenu  : [$obtenu]"
+    fi
+done

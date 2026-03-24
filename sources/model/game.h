@@ -9,6 +9,8 @@
 #include "brick.h"
 #include "../tools/constants.h"
 
+struct GameData;
+
 class Game
 {
 public:
@@ -18,6 +20,16 @@ public:
     bool load(std::string const& filename);
 
 private:
+    // recopie dans Game les donnees lues par le lecteur.
+    void apply_loaded_data(GameData& data);
+    // libere les briques actuellement stockees dans Game.
+    void clear_bricks();
+
+    // versions strictes des tests d'intersection pour la validation initiale
+    bool intersects_strict(Square s1, Square s2);
+    bool intersects_strict(Circle c1, Circle c2);
+    bool intersects_strict(Circle c, Square s);
+
     // vérification des collisions initiales entre les entités
     bool check_bricks_collision();
     bool check_paddle_brick();
