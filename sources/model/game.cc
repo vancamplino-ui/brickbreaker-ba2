@@ -52,7 +52,9 @@ static bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
 namespace
 {
 // Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
-// la classe Game avec de nombreuses methodes de parsing qui ne servent qu'a load().
+// la classe Game avec de nombreuses "methodes" / qui en réaliter sont des helpers 
+//qui ne servent qu'a load().
+
 bool read_next_token(std::ifstream& file, std::string& token)
 {
     while (file >> token) {
