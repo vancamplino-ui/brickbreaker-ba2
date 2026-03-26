@@ -23,43 +23,151 @@ for i in $(seq -w 0 17); do
     ./project tests/t$i.txt
 done
 
-make
-for i in $(seq -w 0 17); do
-    fichier="tests/t$i.txt"
+
+for fichier in tests_rand/rand_*.txt; do
+    nom=$(basename "$fichier" .txt)
     attendu=$(head -n 1 "$fichier" | sed -n 's/.*\"\(.*\)\".*/\1/p')
-    obtenu=$(./project "$fichier" 2>&1 |  tr -d '\n' )
+    obtenu=$(./project "$fichier" 2>&1 | tr -d '\n')
 
     if [ "$obtenu" = "$attendu" ]; then
-        echo "t$i : OK"
+        echo "$nom : OK"
     else
-        echo "t$i : FAIL"
+        echo "$nom : FAIL"
         echo "  attendu : [$attendu]"
         echo "  obtenu  : [$obtenu]"
     fi
 done
 
-tmp_dir=$(mktemp -d)
 
-for i in $(seq -w 0 17); do
-    (
-        fichier="tests/t$i.txt"
-        attendu=$(head -n 1 "$fichier" | sed -n 's/.*\[\(.*\)\].*/\1/p')
-        obtenu=$(./project "$fichier" | tr -d '\n')
+for fichier in tests_rand/rand_*.txt; do
+    nom=$(basename "$fichier" .txt)
+    attendu=$(head -n 1 "$fichier" | sed -n 's/.*\"\(.*\)\".*/\1/p')
+    obtenu=$(./project "$fichier" 2>&1 | tr -d '\n')
 
-        if [ "$obtenu" = "$attendu" ]; then
-            echo "t$i : OK"
-        else
-            echo "t$i : FAIL"
-            echo "  attendu : [$attendu]"
-            echo "  obtenu  : [$obtenu]"
-        fi
-    ) > "$tmp_dir/t$i.out" &
+    if [ "$obtenu" = "$attendu" ]; then
+        echo "$nom : OK"
+    else
+        echo "$nom : FAIL"
+        echo "  attendu : [$attendu]"
+        echo "  obtenu  : [$obtenu]"
+    fi
 done
 
-wait
 
-for i in $(seq -w 0 17); do
-    cat "$tmp_dir/t$i.out"
+for fichier in tests_rand/rand_*.txt; do
+    echo "--- $(basename "$fichier") ---"
+    ./project "$fichier"
 done
+Si tu veux vraiment les 100 lignes écrites une par une, voilà le format:
 
-rm -rf "$tmp_dir"
+./project tests_rand/rand_00.txt
+./project tests_rand/rand_01.txt
+./project tests_rand/rand_02.txt
+./project tests_rand/rand_03.txt
+./project tests_rand/rand_04.txt
+./project tests_rand/rand_05.txt
+./project tests_rand/rand_06.txt
+./project tests_rand/rand_07.txt
+./project tests_rand/rand_08.txt
+./project tests_rand/rand_09.txt
+./project tests_rand/rand_10.txt
+./project tests_rand/rand_11.txt
+./project tests_rand/rand_12.txt
+./project tests_rand/rand_13.txt
+./project tests_rand/rand_14.txt
+./project tests_rand/rand_15.txt
+./project tests_rand/rand_16.txt
+./project tests_rand/rand_17.txt
+./project tests_rand/rand_18.txt
+./project tests_rand/rand_19.txt
+./project tests_rand/rand_20.txt
+./project tests_rand/rand_21.txt
+./project tests_rand/rand_22.txt
+./project tests_rand/rand_23.txt
+./project tests_rand/rand_24.txt
+./project tests_rand/rand_25.txt
+./project tests_rand/rand_26.txt
+./project tests_rand/rand_27.txt
+./project tests_rand/rand_28.txt
+./project tests_rand/rand_29.txt
+./project tests_rand/rand_30.txt
+./project tests_rand/rand_31.txt
+./project tests_rand/rand_32.txt
+./project tests_rand/rand_33.txt
+./project tests_rand/rand_34.txt
+./project tests_rand/rand_35.txt
+./project tests_rand/rand_36.txt
+./project tests_rand/rand_37.txt
+./project tests_rand/rand_38.txt
+./project tests_rand/rand_39.txt
+./project tests_rand/rand_40.txt
+./project tests_rand/rand_41.txt
+./project tests_rand/rand_42.txt
+./project tests_rand/rand_43.txt
+./project tests_rand/rand_44.txt
+./project tests_rand/rand_45.txt
+./project tests_rand/rand_46.txt
+./project tests_rand/rand_47.txt
+./project tests_rand/rand_48.txt
+./project tests_rand/rand_49.txt
+./project tests_rand/rand_50.txt
+./project tests_rand/rand_51.txt
+./project tests_rand/rand_52.txt
+./project tests_rand/rand_53.txt
+./project tests_rand/rand_54.txt
+./project tests_rand/rand_55.txt
+./project tests_rand/rand_56.txt
+./project tests_rand/rand_57.txt
+./project tests_rand/rand_58.txt
+./project tests_rand/rand_59.txt
+./project tests_rand/rand_60.txt
+./project tests_rand/rand_61.txt
+./project tests_rand/rand_62.txt
+./project tests_rand/rand_63.txt
+./project tests_rand/rand_64.txt
+./project tests_rand/rand_65.txt
+./project tests_rand/rand_66.txt
+./project tests_rand/rand_67.txt
+./project tests_rand/rand_68.txt
+./project tests_rand/rand_69.txt
+./project tests_rand/rand_70.txt
+./project tests_rand/rand_71.txt
+./project tests_rand/rand_72.txt
+./project tests_rand/rand_73.txt
+./project tests_rand/rand_74.txt
+./project tests_rand/rand_75.txt
+./project tests_rand/rand_76.txt
+./project tests_rand/rand_77.txt
+./project tests_rand/rand_78.txt
+./project tests_rand/rand_79.txt
+./project tests_rand/rand_80.txt
+./project tests_rand/rand_81.txt
+./project tests_rand/rand_82.txt
+./project tests_rand/rand_83.txt
+./project tests_rand/rand_84.txt
+./project tests_rand/rand_85.txt
+./project tests_rand/rand_86.txt
+./project tests_rand/rand_87.txt
+./project tests_rand/rand_88.txt
+./project tests_rand/rand_89.txt
+./project tests_rand/rand_90.txt
+./project tests_rand/rand_91.txt
+./project tests_rand/rand_92.txt
+./project tests_rand/rand_93.txt
+./project tests_rand/rand_94.txt
+./project tests_rand/rand_95.txt
+./project tests_rand/rand_96.txt
+./project tests_rand/rand_97.txt
+./project tests_rand/rand_98.txt
+./project tests_rand/rand_99.txt
+
+
+
+
+
+GPT-5.4
+
+
+
+
+

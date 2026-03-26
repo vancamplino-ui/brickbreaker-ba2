@@ -202,16 +202,12 @@ static bool validate_brick(Brick* brick, double x, double y, double c)
     return true;
 }
 
-static bool create_rainbow_brick(std::ifstream& file,
-                                 std::vector<Brick*>& bricks,
+static bool create_rainbow_brick(std::vector<Brick*>& bricks,
                                  double x,
                                  double y,
-                                 double c)
+                                 double c,
+                                 int hit_points)
 {
-    int hit_points = 0;
-
-    if (!read_hit_points(file, hit_points)) return false;
-
     RainbowBrick* brick = new RainbowBrick(make_brick_body(x, y, c), hit_points);
 
     if (!brick->is_hit_points_valid()) {
@@ -254,30 +250,44 @@ static bool create_split_brick(std::vector<Brick*>& bricks,
 
 static bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks)
 {
-    int type = 0;
-    double x = 0.0;
-    double y = 0.0;
-    double c = 0.0;
+    std::string stype, sx, sy, sc;
+    int type(0), hit_points(0);
+    double x(0.0), y(0.0), c(0.0);
 
-    if (!read_brick_type(file, type)) return false;
-    if (!read_brick_geometry(file, x, y, c)) return false;
+    if (!read_next_token(file, stype)) return false;
+    if (!read_next_token(file, sx)) return false;
+    if (!read_next_token(file, sy)) return false;
+    if (!read_next_token(file, sc)) return false;
+
+    type = std::stoi(stype);
+    x = std::stod(sx);
+    y = std::stod(sy);
+    c = std::stod(sc);
+
+    if (type < RAINBOW || type > SPLIT) {
+        std::cout << message::invalid_brick_type(type);
+        return false;
+    }
 
     if (type == RAINBOW) {
-        return create_rainbow_brick(file, bricks, x, y, c);
+        std::string token;
+        if (!read_next_token(file, token)) return false;
+        hit_points = std::stoi(token);
+        return create_rainbow_brick(bricks, x, y, c, hit_points);
     }
-
-    if (type == BALL) {
-        return create_ball_brick(bricks, x, y, c);
-    }
-
+    if (type == BALL) return create_ball_brick(bricks, x, y, c);
     return create_split_brick(bricks, x, y, c);
 }
 
 static bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks)
 {
+    std::string token;
     int nb_bricks = 0;
 
-    if (!read_bricks_count(file, nb_bricks)) return false;
+    if (!read_next_token(file, token)) return false;
+
+    nb_bricks = std::stoi(token);
+    if (nb_bricks < 0) return false;
 
     for (int i = 0; i < nb_bricks; ++i) {
         if (!read_one_brick(file, bricks)) return false;
@@ -346,14 +356,24 @@ static bool validate_ball(Ball const& ball,
 
 static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls)
 {
+    std::string sx, sy, sr, sdx, sdy;
     double x = 0.0;
     double y = 0.0;
     double r = 0.0;
     double dx = 0.0;
     double dy = 0.0;
 
-    if (!read_ball_geometry(file, x, y, r)) return false;
-    if (!read_ball_delta(file, dx, dy)) return false;
+    if (!read_next_token(file, sx)) return false;
+    if (!read_next_token(file, sy)) return false;
+    if (!read_next_token(file, sr)) return false;
+    if (!read_next_token(file, sdx)) return false;
+    if (!read_next_token(file, sdy)) return false;
+
+    x = std::stod(sx);
+    y = std::stod(sy);
+    r = std::stod(sr);
+    dx = std::stod(sdx);
+    dy = std::stod(sdy);
 
     Ball ball({{x, y}, r}, {dx, dy});
 
@@ -365,9 +385,13 @@ static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls)
 
 static bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
 {
+    std::string token;
     int nb_balls = 0;
 
-    if (!read_balls_count(file, nb_balls)) return false;
+    if (!read_next_token(file, token)) return false;
+
+    nb_balls = std::stoi(token);
+    if (nb_balls < 0) return false;
 
     for (int i = 0; i < nb_balls; ++i) {
         if (!read_one_ball(file, balls)) return false;

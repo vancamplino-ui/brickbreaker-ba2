@@ -1,180 +1,274 @@
-# Structure de `game.cc`
+# Structure de `Game::load`
 
-Ce document est réécrit pour correspondre au `game.cc` actuel du projet.
+Ce fichier décrit la structure réelle de la fonction `Game::load` dans `game.cc`.
 
-Il décrit :
-- les appels réellement présents dans `Game::load`
-- les fonctions auxiliaires du namespace anonyme
-- l’ordre exact des validations actuellement implémentées
+Le but n'est pas de lister tout le fichier, mais de montrer ce que fait `load`
+et dans quel ordre.
 
 ---
 
-## 1. Arbre réel des appels
+## Vue générale
 
-```mermaid
-flowchart TD
+`Game::load(filename)` suit ce chemin :
 
-    A["1. Game::load(filename)"]
-
-    A --> B["1.1 ouvrir std::ifstream file"]
-    A --> C["1.2 read_score(file, score)"]
-    A --> D["1.3 read_lives(file, lives)"]
-    A --> E["1.4 read_paddle(file, paddle, px, py, pr)"]
-    A --> F["1.5 read_bricks(file, bricks)"]
-    A --> G["1.6 read_balls(file, balls)"]
-
-    C --> C1["1.2.1 read_next_token"]
-    C --> C2["1.2.2 stoi"]
-    C --> C3["1.2.3 message::invalid_score si score < 0"]
-
-    D --> D1["1.3.1 read_next_token"]
-    D --> D2["1.3.2 stoi"]
-    D --> D3["1.3.3 message::invalid_lives si lives < 0"]
-
-    E --> E1["1.4.1 read_next_token x"]
-    E --> E2["1.4.2 read_next_token y"]
-    E --> E3["1.4.3 read_next_token r"]
-    E --> E4["1.4.4 stod"]
-    E --> E5["1.4.5 paddle = Paddle({x, y}, r)"]
-    E --> E6["1.4.6 paddle.is_valid"]
-    E --> E7["1.4.7 message::paddle_outside si invalide"]
-
-    F --> F1["1.5.1 read_bricks_count"]
-    F --> F2["1.5.2 boucle sur nb_bricks"]
-    F2 --> F3["1.5.2.1 read_one_brick"]
-    F3 --> F4["1.5.2.1.1 read_brick_type"]
-    F3 --> F5["1.5.2.1.2 read_brick_geometry"]
-    F3 --> F6["1.5.2.1.3 si type = RAINBOW"]
-    F3 --> F7["1.5.2.1.4 si type = BALL"]
-    F3 --> F8["1.5.2.1.5 sinon SPLIT"]
-
-    F6 --> F61["1.5.2.1.3.1 create_rainbow_brick"]
-    F61 --> F62["1.5.2.1.3.2 read_hit_points"]
-    F61 --> F63["1.5.2.1.3.3 make_brick_body"]
-    F61 --> F64["1.5.2.1.3.4 new RainbowBrick"]
-    F61 --> F65["1.5.2.1.3.5 is_hit_points_valid"]
-    F61 --> F66["1.5.2.1.3.6 validate_brick"]
-
-    F7 --> F71["1.5.2.1.4.1 create_ball_brick"]
-    F71 --> F72["1.5.2.1.4.2 make_brick_body"]
-    F71 --> F73["1.5.2.1.4.3 new BallBrick"]
-    F71 --> F74["1.5.2.1.4.4 validate_brick"]
-
-    F8 --> F81["1.5.2.1.5.1 create_split_brick"]
-    F81 --> F82["1.5.2.1.5.2 make_brick_body"]
-    F81 --> F83["1.5.2.1.5.3 new SplitBrick"]
-    F81 --> F84["1.5.2.1.5.4 validate_brick"]
-
-    G --> G1["1.6.1 read_balls_count"]
-    G --> G2["1.6.2 boucle sur nb_balls"]
-    G2 --> G3["1.6.2.1 read_one_ball"]
-    G3 --> G4["1.6.2.1.1 read_ball_geometry"]
-    G3 --> G5["1.6.2.1.2 read_ball_delta"]
-    G3 --> G6["1.6.2.1.3 Ball({{x, y}, r}, {dx, dy})"]
-    G3 --> G7["1.6.2.1.4 validate_ball"]
-
-    G7 --> G71["1.6.2.1.4.1 ball.is_inside_arena"]
-    G7 --> G72["1.6.2.1.4.2 ball.is_delta_valid"]
-    G7 --> G73["1.6.2.1.4.3 message::ball_outside"]
-    G7 --> G74["1.6.2.1.4.4 message::invalid_delta"]
-
-    classDef root fill:#1d4ed8,color:#ffffff,stroke:#1e3a8a,stroke-width:3px
-    classDef main fill:#dbeafe,color:#0f172a,stroke:#60a5fa,stroke-width:2px
-    classDef parse fill:#ede9fe,color:#0f172a,stroke:#8b5cf6,stroke-width:2px
-    classDef build fill:#dcfce7,color:#0f172a,stroke:#22c55e,stroke-width:2px
-    classDef validate fill:#fee2e2,color:#0f172a,stroke:#ef4444,stroke-width:2px
-
-    class A root
-    class B,C,D,E,F,G,F1,F2,F3,F6,F7,F8,G1,G2,G3 main
-    class C1,C2,D1,D2,E1,E2,E3,E4,F4,F5,F62,G4,G5 parse
-    class E5,F63,F64,F72,F73,F82,F83,G6 build
-    class C3,D3,E6,E7,F65,F66,F74,F84,G7,G71,G72,G73,G74 validate
+```text
+Game::load
+├── 1. créer des variables temporaires
+├── 2. appeler load_game_data(filename, ...)
+│   ├── read_score
+│   ├── read_lives
+│   ├── read_paddle
+│   ├── read_bricks
+│   │   └── read_one_brick
+│   └── read_balls
+│       └── read_one_ball
+├── 3. copier les données lues dans l'objet Game
+├── 4. vérifier les collisions initiales
+│   ├── bricks_intersect
+│   ├── paddle_intersects_brick
+│   ├── balls_intersect
+│   ├── ball_intersects_brick
+│   └── paddle_intersects_ball
+└── 5. afficher le message de succès
 ```
 
 ---
 
-## 2. Ordre réel des validations
+## Arbre d'appel de fonctions
 
-```mermaid
-flowchart TD
-
-    A["1. Validation réelle dans Game::load"]
-
-    A --> B["1.1 Score"]
-    B --> B1["1.1.1 lire token"]
-    B --> B2["1.1.2 stoi"]
-    B --> B3["1.1.3 tester score < 0"]
-    B --> B4["1.1.4 sinon score valide"]
-
-    A --> C["1.2 Lives"]
-    C --> C1["1.2.1 lire token"]
-    C --> C2["1.2.2 stoi"]
-    C --> C3["1.2.3 tester lives < 0"]
-    C --> C4["1.2.4 sinon lives valide"]
-
-    A --> D["1.3 Paddle"]
-    D --> D1["1.3.1 lire x y r"]
-    D --> D2["1.3.2 construire Paddle"]
-    D --> D3["1.3.3 tester paddle.is_valid"]
-    D --> D4["1.3.4 sinon message::paddle_outside"]
-
-    A --> E["1.4 Bricks"]
-    E --> E1["1.4.1 lire nb_bricks"]
-    E --> E2["1.4.2 tester nb_bricks >= 0"]
-    E --> E3["1.4.3 pour chaque brick"]
-    E3 --> E31["1.4.3.1 lire type"]
-    E3 --> E32["1.4.3.2 tester type dans {0,1,2}"]
-    E3 --> E33["1.4.3.3 lire x y c"]
-    E3 --> E34["1.4.3.4 si RAINBOW lire hit_points"]
-    E3 --> E35["1.4.3.5 si RAINBOW tester hit_points"]
-    E3 --> E36["1.4.3.6 construire la brique"]
-    E3 --> E37["1.4.3.7 tester is_inside_arena"]
-    E3 --> E38["1.4.3.8 tester is_size_valid"]
-
-    A --> F["1.5 Balls"]
-    F --> F1["1.5.1 lire nb_balls"]
-    F --> F2["1.5.2 tester nb_balls >= 0"]
-    F --> F3["1.5.3 pour chaque ball"]
-    F3 --> F31["1.5.3.1 lire x y r"]
-    F3 --> F32["1.5.3.2 lire dx dy"]
-    F3 --> F33["1.5.3.3 construire Ball"]
-    F3 --> F34["1.5.3.4 tester is_inside_arena"]
-    F3 --> F35["1.5.3.5 tester is_delta_valid"]
-
-    A --> G["1.6 Fin actuelle"]
-    G --> G1["1.6.1 aucun test de collision ici"]
-    G --> G2["1.6.2 si tout passe retour true"]
-
-    classDef root fill:#166534,color:#ffffff,stroke:#14532d,stroke-width:3px
-    classDef section fill:#fef3c7,color:#0f172a,stroke:#f59e0b,stroke-width:2px
-    classDef read fill:#dbeafe,color:#0f172a,stroke:#3b82f6,stroke-width:2px
-    classDef validate fill:#fee2e2,color:#0f172a,stroke:#ef4444,stroke-width:2px
-    classDef note fill:#e5e7eb,color:#0f172a,stroke:#6b7280,stroke-width:2px
-
-    class A root
-    class B,C,D,E,F,G section
-    class B1,B2,C1,C2,D1,E1,E31,E33,E34,F1,F31,F32 read
-    class B3,B4,C3,C4,D2,D3,D4,E2,E32,E35,E36,E37,E38,F2,F33,F34,F35 validate
-    class G1,G2 note
+```text
+Game::load
+├── load_game_data
+│   ├── read_score
+│   │   └── read_next_token
+│   ├── read_lives
+│   │   └── read_next_token
+│   ├── read_paddle
+│   │   ├── read_next_token
+│   │   ├── read_next_token
+│   │   ├── read_next_token
+│   │   └── Paddle::is_valid
+│   ├── read_bricks
+│   │   ├── read_next_token
+│   │   └── read_one_brick
+│   │       ├── read_next_token
+│   │       ├── read_next_token
+│   │       ├── read_next_token
+│   │       ├── read_next_token
+│   │       ├── create_rainbow_brick
+│   │       │   ├── make_brick_body
+│   │       │   ├── RainbowBrick::is_hit_points_valid
+│   │       │   └── validate_brick
+│   │       │       ├── Brick::is_inside_arena
+│   │       │       └── Brick::is_size_valid
+│   │       ├── create_ball_brick
+│   │       │   ├── make_brick_body
+│   │       │   └── validate_brick
+│   │       └── create_split_brick
+│   │           ├── make_brick_body
+│   │           └── validate_brick
+│   └── read_balls
+│       ├── read_next_token
+│       └── read_one_ball
+│           ├── read_next_token
+│           ├── read_next_token
+│           ├── read_next_token
+│           ├── read_next_token
+│           ├── read_next_token
+│           └── validate_ball
+│               ├── Ball::is_inside_arena
+│               └── Ball::is_delta_valid
+├── Game::clear_bricks
+│   └── clear_bricks
+├── Game::bricks_intersect
+│   └── Game::intersects
+├── Game::paddle_intersects_brick
+│   └── Game::intersects
+├── Game::balls_intersect
+│   └── Game::intersects
+├── Game::ball_intersects_brick
+│   └── Game::intersects
+├── Game::paddle_intersects_ball
+│   └── Game::intersects
+└── message::success
 ```
 
 ---
 
-## 3. Ce qui est spécifique à ton code actuel
+## 1. Variables temporaires créées dans `load`
 
-- `read_next_token` ignore les lignes de commentaire qui commencent par `#`.
-- Toutes les fonctions de lecture sont définies dans un `namespace` anonyme local à `game.cc`.
-- `Game::load` lit dans cet ordre exact : `score`, `lives`, `paddle`, `bricks`, puis `balls`.
-- Pour les briques, le code distingue bien trois cas : `RAINBOW`, `BALL` et `SPLIT`.
-- Le cas `RAINBOW` est le seul qui lit un `hit_points`.
-- La validation des briques est séparée dans `validate_brick`.
-- La validation des balles est séparée dans `validate_ball`.
-- Il n’y a pas encore de vérification de collisions dans `Game::load`.
+Avant de modifier l'objet `Game`, la fonction crée :
+
+- `new_score`
+- `new_lives`
+- `new_paddle`
+- `new_balls`
+- `new_bricks`
+
+Ces variables servent à lire tout le fichier sans casser l'état courant du jeu
+si une erreur apparaît pendant la lecture.
 
 ---
 
-## 4. Affichage dans VS Code
+## 2. Lecture du fichier : `load_game_data`
 
-- ouvrir ce fichier Markdown
-- utiliser `Cmd + Shift + V`
-- ou clic droit `Open Preview`
+`load()` délègue toute la lecture à :
+
+```cpp
+load_game_data(filename, new_score, new_lives, new_paddle, new_balls, new_bricks)
+```
+
+Cette fonction :
+
+1. ouvre le fichier
+2. lit les données dans l'ordre exact demandé
+3. retourne `false` dès qu'une erreur est détectée
+
+Ordre réel de lecture :
+
+```text
+load_game_data
+├── read_score
+├── read_lives
+├── read_paddle
+├── read_bricks
+└── read_balls
+```
+
+---
+
+## 3. Structure de la lecture des briques
+
+La partie briques est structurée comme ceci :
+
+```text
+read_bricks
+├── lire nb_bricks
+└── boucle sur nb_bricks
+    └── read_one_brick
+        ├── lire type
+        ├── lire x
+        ├── lire y
+        ├── lire c
+        ├── si type == RAINBOW
+        │   ├── lire hit_points
+        │   └── create_rainbow_brick
+        ├── si type == BALL
+        │   └── create_ball_brick
+        └── sinon
+            └── create_split_brick
+```
+
+Ensuite chaque création appelle une validation adaptée :
+
+- `validate_brick`
+- et, pour les Rainbow bricks, `is_hit_points_valid`
+
+---
+
+## 4. Structure de la lecture des balles
+
+La partie balles est structurée comme ceci :
+
+```text
+read_balls
+├── lire nb_balls
+└── boucle sur nb_balls
+    └── read_one_ball
+        ├── lire x
+        ├── lire y
+        ├── lire r
+        ├── lire dx
+        ├── lire dy
+        ├── construire Ball
+        └── validate_ball
+```
+
+La validation d'une balle teste :
+
+- `ball.is_inside_arena()`
+- `ball.is_delta_valid()`
+
+---
+
+## 5. Transfert des données temporaires dans `Game`
+
+Si `load_game_data(...)` réussit, alors `load()` recopie les données dans
+l'objet `Game` :
+
+```text
+score  = new_score
+lives  = new_lives
+paddle = new_paddle
+balls  = new_balls
+clear_bricks()
+bricks = move(new_bricks)
+```
+
+Donc l'état courant du jeu n'est remplacé qu'après une lecture complète.
+
+---
+
+## 6. Validations globales après la lecture
+
+Après avoir chargé les données dans `Game`, `load()` vérifie les collisions
+initiales dans cet ordre exact :
+
+```text
+1. bricks_intersect()
+2. paddle_intersects_brick()
+3. balls_intersect()
+4. ball_intersects_brick()
+5. paddle_intersects_ball()
+```
+
+Chaque fonction :
+
+- parcourt les objets concernés
+- utilise `Game::intersects(...)`
+- affiche un message d'erreur si une collision est trouvée
+- retourne `true` si un problème existe
+
+Donc dans `load()` :
+
+```text
+si l'une de ces fonctions retourne true
+=> load retourne false
+```
+
+---
+
+## 7. Fin de la fonction
+
+Si :
+
+- la lecture du fichier s'est bien passée
+- les objets sont valides
+- aucune collision initiale n'est détectée
+
+alors :
+
+```text
+message::success()
+return true
+```
+
+---
+
+## Résumé court
+
+La structure réelle de `load` est donc :
+
+```text
+load
+├── lire tout dans des variables temporaires
+├── copier dans Game
+├── tester les collisions initiales
+└── valider le chargement
+```
+
+Et la partie lecture interne est :
+
+```text
+score -> lives -> paddle -> bricks -> balls
+```
