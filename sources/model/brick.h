@@ -4,7 +4,7 @@
 #include "../tools/tools.h"
 #include "../tools/constants.h"
  
-enum BrickType { RAINBOW = 0, BALL = 1, SPLIT = 2 };
+enum BrickType { RAINBOW, BALL, SPLIT };
  
 class Brick
 {

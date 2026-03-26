@@ -32,7 +32,7 @@ private:
     bool balls_intersect();
     bool ball_intersects_brick();
     bool paddle_intersects_ball();
-    
+
     int score;
     int lives;
 

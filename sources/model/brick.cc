@@ -25,9 +25,9 @@ bool Brick::is_inside_arena() const
     double ymin(body.center.y - body.half_size);
     double ymax(body.center.y + body.half_size);
  
-    if (xmin < 0)          return false;
+    if (xmin < 0) return false;
     if (xmax > arena_size) return false;
-    if (ymin < 0)          return false;
+    if (ymin < 0) return false;
     if (ymax > arena_size) return false;
     return true;
 }
@@ -35,13 +35,12 @@ bool Brick::is_inside_arena() const
 // vérifie que la taille de la brique est >= brick_size_min
 bool Brick::is_size_valid() const
 {
-    if (body.half_size * 2 >= brick_size_min) return true;
-    return false;
+    return body.half_size * 2 >= brick_size_min;
 }
  
 bool Brick::is_valid() const
 {
-    if (!is_size_valid())   return false;
+    if (!is_size_valid()) return false;
     if (!is_inside_arena()) return false;
     return true;
 }
@@ -59,13 +58,12 @@ int RainbowBrick::getHitPoints() const
 // vérifie que hit_points est bien dans [1, 7]
 bool RainbowBrick::is_hit_points_valid() const
 {
-    if (hit_points >= 1 && hit_points <= 7) return true;
-    return false;
+    return hit_points >= 1 && hit_points <= 7;
 }
  
 bool RainbowBrick::is_valid() const
 {
-    if (!Brick::is_valid())     return false;
+    if (!Brick::is_valid()) return false;
     if (!is_hit_points_valid()) return false;
     return true;
 }

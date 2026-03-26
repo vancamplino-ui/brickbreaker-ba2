@@ -12,14 +12,12 @@ Circle Paddle::getArc() const
 
 bool Paddle::is_y_valid() const
 {
-    if (arc.center.y <= 0) return true;
-    return false;
+    return arc.center.y <= 0;
 }
 
 bool Paddle::is_visible() const
 {
-    if (arc.center.y + arc.radius > 0) return true;
-    return false;
+    return arc.center.y + arc.radius > 0;
 }
 
 bool Paddle::valid_extremities() const
@@ -27,20 +25,18 @@ bool Paddle::valid_extremities() const
     double left(arc.center.x - arc.radius);
     double right(arc.center.x + arc.radius);
 
-    if (left >= 0 && right <= arena_size) return true;
-    return false;
+    return left >= 0 && right <= arena_size;
 }
 
 bool Paddle::is_x_valid() const
 {
-    if (valid_extremities()) return true;
-    return false;
+    return valid_extremities();
 }
 
 bool Paddle::is_valid() const
 {
     if (!is_y_valid()) return false;
     if (!is_visible()) return false;
-    if (!valid_extremities()) return false;
+    if (!is_x_valid()) return false;
     return true;
 }

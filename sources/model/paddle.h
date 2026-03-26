@@ -7,11 +7,11 @@
 class Paddle
 {
 public:
-    //constructeur de la raquette. 
+    // constructeur de la raquette. 
     Paddle(Point center = {0.0, 0.0}, double radius = 0.0); 
     Circle getArc() const;
 
-    // contrôle des donnée fournie en entrée pour voir si la raquette est valide ou pas 
+    // contrôle des données fournies en entrée pour voir si la raquette est valide ou pas 
     bool is_y_valid() const;
     bool is_x_valid() const;
     bool is_visible() const;

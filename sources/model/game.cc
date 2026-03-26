@@ -1,13 +1,57 @@
-#include "game.h"
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
 
+#include "game.h"
 #include "message.h"
-#include "../tools/constants.h"
 #include "../tools/tools.h"
+#include "../tools/constants.h"
+
+struct GameData;
+
+static bool read_next_token(std::ifstream& file, std::string& token);
+static bool read_score(std::ifstream& file, int& score);
+static bool read_lives(std::ifstream& file, int& lives);
+static bool read_paddle(std::ifstream& file, Paddle& paddle);
+static bool read_bricks_count(std::ifstream& file, int& nb_bricks);
+static bool read_brick_type(std::ifstream& file, int& type);
+static bool read_brick_geometry(std::ifstream& file,
+                                double& x,
+                                double& y,
+                                double& c);
+static bool read_hit_points(std::ifstream& file, int& hit_points);
+static Square make_brick_body(double x, double y, double c);
+static bool validate_brick(Brick* brick, double x, double y, double c);
+static bool create_rainbow_brick(std::ifstream& file,
+                                 std::vector<Brick*>& bricks,
+                                 double x,
+                                 double y,
+                                 double c);
+static bool create_ball_brick(std::vector<Brick*>& bricks,
+                              double x,
+                              double y,
+                              double c);
+static bool create_split_brick(std::vector<Brick*>& bricks,
+                               double x,
+                               double y,
+                               double c);
+static bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks);
+static bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks);
+static bool read_balls_count(std::ifstream& file, int& nb_balls);
+static bool read_ball_geometry(std::ifstream& file,
+                               double& x,
+                               double& y,
+                               double& r);
+static bool read_ball_delta(std::ifstream& file, double& dx, double& dy);
+static bool validate_ball(Ball const& ball,
+                          double x,
+                          double y,
+                          double dx,
+                          double dy);
+static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls);
+static bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
+static bool load_file(std::string const& filename, GameData& data);
 
 struct GameData
 {
@@ -122,7 +166,10 @@ static bool read_brick_type(std::ifstream& file, int& type)
     return true;
 }
 
-static bool read_brick_geometry(std::ifstream& file, double& x, double& y, double& c)
+static bool read_brick_geometry(std::ifstream& file,
+                                double& x,
+                                double& y,
+                                double& c)
 {
     std::string sx, sy, sc;
 
@@ -192,7 +239,10 @@ static bool create_rainbow_brick(std::ifstream& file,
     return true;
 }
 
-static bool create_ball_brick(std::vector<Brick*>& bricks, double x, double y, double c)
+static bool create_ball_brick(std::vector<Brick*>& bricks,
+                              double x,
+                              double y,
+                              double c)
 {
     BallBrick* brick = new BallBrick(make_brick_body(x, y, c));
 
@@ -202,7 +252,10 @@ static bool create_ball_brick(std::vector<Brick*>& bricks, double x, double y, d
     return true;
 }
 
-static bool create_split_brick(std::vector<Brick*>& bricks, double x, double y, double c)
+static bool create_split_brick(std::vector<Brick*>& bricks,
+                               double x,
+                               double y,
+                               double c)
 {
     SplitBrick* brick = new SplitBrick(make_brick_body(x, y, c));
 
@@ -256,7 +309,10 @@ static bool read_balls_count(std::ifstream& file, int& nb_balls)
     return nb_balls >= 0;
 }
 
-static bool read_ball_geometry(std::ifstream& file, double& x, double& y, double& r)
+static bool read_ball_geometry(std::ifstream& file,
+                               double& x,
+                               double& y,
+                               double& r)
 {
     std::string sx, sy, sr;
 
@@ -282,7 +338,11 @@ static bool read_ball_delta(std::ifstream& file, double& dx, double& dy)
     return true;
 }
 
-static bool validate_ball(Ball const& ball, double x, double y, double dx, double dy)
+static bool validate_ball(Ball const& ball,
+                          double x,
+                          double y,
+                          double dx,
+                          double dy)
 {
     if (!ball.is_inside_arena()) {
         std::cout << message::ball_outside(x, y);
@@ -432,16 +492,14 @@ bool Game::intersects(Square s1, Square s2)
           - (s1.half_size + s2.half_size));
     double dy(std::abs(s1.center.y - s2.center.y)
           - (s1.half_size + s2.half_size));
-    if (dx < 0.0 && dy < 0.0) return true;
-    return false;
+    return dx < 0.0 && dy < 0.0;
 }
 
 bool Game::intersects(Circle c1, Circle c2)
 {
     double d(distance(c1.center, c2.center));
     double gap(d - (c1.radius + c2.radius));
-    if (gap < 0.0) return true;
-    return false;
+    return gap < 0.0;
 }
 
 bool Game::intersects(Circle c, Square s)
@@ -454,8 +512,7 @@ bool Game::intersects(Circle c, Square s)
     };
     double d(distance(c.center, closest));
     double gap(d - c.radius);
-    if (gap < 0.0) return true;
-    return false;
+    return gap < 0.0;
 }
 
 bool Game::bricks_intersect()
