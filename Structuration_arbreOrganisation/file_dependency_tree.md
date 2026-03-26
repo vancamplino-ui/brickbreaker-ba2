@@ -105,10 +105,10 @@ flowchart TD
 
     class GAMECC root
     class GAMEH head
+
     class PAD,BAL,BRI,CON,TOO dep
     class MSG extra
 ```
-
 ---
 
 ## 3. Lecture simple

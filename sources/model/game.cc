@@ -49,7 +49,11 @@ static bool validate_ball(Ball const& ball,
                           double dy);
 static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls);
 static bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
-static bool read_next_token(std::ifstream& file, std::string& token)
+namespace
+{
+// Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
+// la classe Game avec de nombreuses methodes de parsing qui ne servent qu'a load().
+bool read_next_token(std::ifstream& file, std::string& token)
 {
     while (file >> token) {
         if (!token.empty() && token[0] == '#') {
@@ -64,7 +68,16 @@ static bool read_next_token(std::ifstream& file, std::string& token)
     return false;
 }
 
-static bool read_score(std::ifstream& file, int& score)
+void clear_bricks(std::vector<Brick*>& bricks)
+{
+    for (Brick* brick : bricks) {
+        delete brick;
+    }
+
+    bricks.clear();
+}
+
+bool read_score(std::ifstream& file, int& score)
 {
     std::string token;
 
@@ -80,16 +93,7 @@ static bool read_score(std::ifstream& file, int& score)
     return true;
 }
 
-static void clear_bricks(std::vector<Brick*>& bricks)
-{
-    for (Brick* brick : bricks) {
-        delete brick;
-    }
-
-    bricks.clear();
-}
-
-static bool read_lives(std::ifstream& file, int& lives)
+bool read_lives(std::ifstream& file, int& lives)
 {
     std::string token;
 
@@ -105,7 +109,7 @@ static bool read_lives(std::ifstream& file, int& lives)
     return true;
 }
 
-static bool read_paddle(std::ifstream& file, Paddle& paddle)
+bool read_paddle(std::ifstream& file, Paddle& paddle)
 {
     std::string sx, sy, sr;
 
@@ -185,7 +189,7 @@ static Square make_brick_body(double x, double y, double c)
     return {{x, y}, c / 2.0};
 }
 
-static bool validate_brick(Brick* brick, double x, double y, double c)
+bool validate_brick(Brick* brick, double x, double y, double c)
 {
     if (!brick->is_inside_arena()) {
         std::cout << message::brick_outside(x, y);
@@ -202,11 +206,11 @@ static bool validate_brick(Brick* brick, double x, double y, double c)
     return true;
 }
 
-static bool create_rainbow_brick(std::vector<Brick*>& bricks,
-                                 double x,
-                                 double y,
-                                 double c,
-                                 int hit_points)
+bool create_rainbow_brick(std::vector<Brick*>& bricks,
+                          double x,
+                          double y,
+                          double c,
+                          int hit_points)
 {
     RainbowBrick* brick = new RainbowBrick(make_brick_body(x, y, c), hit_points);
 
@@ -222,7 +226,7 @@ static bool create_rainbow_brick(std::vector<Brick*>& bricks,
     return true;
 }
 
-static bool create_ball_brick(std::vector<Brick*>& bricks,
+bool create_ball_brick(std::vector<Brick*>& bricks,
                               double x,
                               double y,
                               double c)
@@ -235,7 +239,7 @@ static bool create_ball_brick(std::vector<Brick*>& bricks,
     return true;
 }
 
-static bool create_split_brick(std::vector<Brick*>& bricks,
+bool create_split_brick(std::vector<Brick*>& bricks,
                                double x,
                                double y,
                                double c)
@@ -248,7 +252,7 @@ static bool create_split_brick(std::vector<Brick*>& bricks,
     return true;
 }
 
-static bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks)
+bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks)
 {
     std::string stype, sx, sy, sc;
     int type(0), hit_points(0);
@@ -271,15 +275,18 @@ static bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks)
 
     if (type == RAINBOW) {
         std::string token;
+
         if (!read_next_token(file, token)) return false;
+
         hit_points = std::stoi(token);
         return create_rainbow_brick(bricks, x, y, c, hit_points);
     }
+
     if (type == BALL) return create_ball_brick(bricks, x, y, c);
     return create_split_brick(bricks, x, y, c);
 }
 
-static bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks)
+bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks)
 {
     std::string token;
     int nb_bricks = 0;
@@ -335,7 +342,7 @@ static bool read_ball_delta(std::ifstream& file, double& dx, double& dy)
     return true;
 }
 
-static bool validate_ball(Ball const& ball,
+bool validate_ball(Ball const& ball,
                           double x,
                           double y,
                           double dx,
@@ -354,7 +361,7 @@ static bool validate_ball(Ball const& ball,
     return true;
 }
 
-static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls)
+bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls)
 {
     std::string sx, sy, sr, sdx, sdy;
     double x = 0.0;
@@ -383,7 +390,7 @@ static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls)
     return true;
 }
 
-static bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
+bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
 {
     std::string token;
     int nb_balls = 0;
@@ -400,12 +407,12 @@ static bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
     return true;
 }
 
-static bool load_game_data(std::string const& filename,
-                           int& score,
-                           int& lives,
-                           Paddle& paddle,
-                           std::vector<Ball>& balls,
-                           std::vector<Brick*>& bricks)
+bool load_game_data(std::string const& filename,
+                    int& score,
+                    int& lives,
+                    Paddle& paddle,
+                    std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks)
 {
     std::ifstream file(filename);
 
@@ -427,6 +434,7 @@ static bool load_game_data(std::string const& filename,
 
     return true;
 }
+} // namespace
 
 Game::Game()
     : score(0), lives(0), paddle(), balls(), bricks()
@@ -437,6 +445,7 @@ Game::~Game()
 {
     clear_bricks();
 }
+
 
 void Game::clear_bricks()
 {
@@ -532,6 +541,7 @@ bool Game::paddle_intersects_ball()
     }
     return false;
 }
+
 
 bool Game::load(std::string const& filename)
 {
