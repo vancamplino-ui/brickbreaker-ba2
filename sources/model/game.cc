@@ -7,11 +7,17 @@
 #include "message.h"
 #include "../tools/tools.h"
 #include "../tools/constants.h"
+namespace
+{
+// Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
+// la classe Game avec de nombreuses "methodes" / qui en réaliter sont des helpers 
+//qui ne servent qu'a load().
 
-static bool read_next_token(std::ifstream& file, std::string& token);
-static bool read_score(std::ifstream& file, int& score);
-static bool read_lives(std::ifstream& file, int& lives);
-static bool read_paddle(std::ifstream& file, Paddle& paddle);
+bool read_next_token(std::ifstream& file, std::string& token);
+void clear_bricks(std::vector<Brick*>& bricks);
+bool read_score(std::ifstream& file, int& score);
+bool read_lives(std::ifstream& file, int& lives);
+bool read_paddle(std::ifstream& file, Paddle& paddle);
 static bool read_bricks_count(std::ifstream& file, int& nb_bricks);
 static bool read_brick_type(std::ifstream& file, int& type);
 static bool read_brick_geometry(std::ifstream& file,
@@ -20,40 +26,41 @@ static bool read_brick_geometry(std::ifstream& file,
                                 double& c);
 static bool read_hit_points(std::ifstream& file, int& hit_points);
 static Square make_brick_body(double x, double y, double c);
-static bool validate_brick(Brick* brick, double x, double y, double c);
-static bool create_rainbow_brick(std::ifstream& file,
-                                 std::vector<Brick*>& bricks,
-                                 double x,
-                                 double y,
-                                 double c);
-static bool create_ball_brick(std::vector<Brick*>& bricks,
-                              double x,
-                              double y,
-                              double c);
-static bool create_split_brick(std::vector<Brick*>& bricks,
-                               double x,
-                               double y,
-                               double c);
-static bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks);
-static bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks);
+bool validate_brick(Brick* brick, double x, double y, double c);
+bool create_rainbow_brick(std::vector<Brick*>& bricks,
+                          double x,
+                          double y,
+                          double c,
+                          int hit_points);
+bool create_ball_brick(std::vector<Brick*>& bricks,
+                       double x,
+                       double y,
+                       double c);
+bool create_split_brick(std::vector<Brick*>& bricks,
+                        double x,
+                        double y,
+                        double c);
+bool read_one_brick(std::ifstream& file, std::vector<Brick*>& bricks);
+bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks);
 static bool read_balls_count(std::ifstream& file, int& nb_balls);
 static bool read_ball_geometry(std::ifstream& file,
                                double& x,
                                double& y,
                                double& r);
 static bool read_ball_delta(std::ifstream& file, double& dx, double& dy);
-static bool validate_ball(Ball const& ball,
-                          double x,
-                          double y,
-                          double dx,
-                          double dy);
-static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls);
-static bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
-namespace
-{
-// Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
-// la classe Game avec de nombreuses "methodes" / qui en réaliter sont des helpers 
-//qui ne servent qu'a load().
+bool validate_ball(Ball const& ball,
+                   double x,
+                   double y,
+                   double dx,
+                   double dy);
+bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls);
+bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
+bool load_game_data(std::string const& filename,
+                    int& score,
+                    int& lives,
+                    Paddle& paddle,
+                    std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks);
 
 bool read_next_token(std::ifstream& file, std::string& token)
 {
