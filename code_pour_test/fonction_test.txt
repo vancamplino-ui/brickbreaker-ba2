@@ -38,17 +38,28 @@ for i in $(seq -w 0 17); do
     fi
 done
 
+tmp_dir=$(mktemp -d)
+
 for i in $(seq -w 0 17); do
-    fichier="tests/t$i.txt"
+    (
+        fichier="tests/t$i.txt"
+        attendu=$(head -n 1 "$fichier" | sed -n 's/.*\[\(.*\)\].*/\1/p')
+        obtenu=$(./project "$fichier" | tr -d '\n')
 
-    attendu=$(head -n 1 "$fichier" | sed -n 's/.*\[\(.*\)\].*/\1/p')
-    obtenu=$(./project "$fichier" | tr -d '\n')
-
-    if [ "$obtenu" = "$attendu" ]; then
-        echo "t$i : OK"
-    else
-        echo "t$i : FAIL"
-        echo "  attendu : [$attendu]"
-        echo "  obtenu  : [$obtenu]"
-    fi
+        if [ "$obtenu" = "$attendu" ]; then
+            echo "t$i : OK"
+        else
+            echo "t$i : FAIL"
+            echo "  attendu : [$attendu]"
+            echo "  obtenu  : [$obtenu]"
+        fi
+    ) > "$tmp_dir/t$i.out" &
 done
+
+wait
+
+for i in $(seq -w 0 17); do
+    cat "$tmp_dir/t$i.out"
+done
+
+rm -rf "$tmp_dir"

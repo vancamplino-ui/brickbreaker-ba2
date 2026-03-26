@@ -8,8 +8,6 @@
 #include "../tools/tools.h"
 #include "../tools/constants.h"
 
-struct GameData;
-
 static bool read_next_token(std::ifstream& file, std::string& token);
 static bool read_score(std::ifstream& file, int& score);
 static bool read_lives(std::ifstream& file, int& lives);
@@ -51,26 +49,6 @@ static bool validate_ball(Ball const& ball,
                           double dy);
 static bool read_one_ball(std::ifstream& file, std::vector<Ball>& balls);
 static bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
-static bool load_file(std::string const& filename, GameData& data);
-
-struct GameData
-{
-    int score = 0;
-    int lives = 0;
-    Paddle paddle;
-    std::vector<Ball> balls;
-    std::vector<Brick*> bricks;
-
-    GameData() = default;
-    GameData(GameData const&) = delete;
-    GameData& operator=(GameData const&) = delete;
-    GameData(GameData&& other) noexcept;
-    GameData& operator=(GameData&& other) noexcept;
-    ~GameData();
-
-    void clear();
-};
-
 static bool read_next_token(std::ifstream& file, std::string& token)
 {
     while (file >> token) {
@@ -100,6 +78,15 @@ static bool read_score(std::ifstream& file, int& score)
     }
 
     return true;
+}
+
+static void clear_bricks(std::vector<Brick*>& bricks)
+{
+    for (Brick* brick : bricks) {
+        delete brick;
+    }
+
+    bricks.clear();
 }
 
 static bool read_lives(std::ifstream& file, int& lives)
@@ -389,38 +376,28 @@ static bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
     return true;
 }
 
-static bool load_file(std::string const& filename, GameData& data)
+static bool load_game_data(std::string const& filename,
+                           int& score,
+                           int& lives,
+                           Paddle& paddle,
+                           std::vector<Ball>& balls,
+                           std::vector<Brick*>& bricks)
 {
     std::ifstream file(filename);
 
-    if (!file) {
+    if (!file) return false;
+
+    if (!read_score(file, score)) return false;
+    if (!read_lives(file, lives)) return false;
+    if (!read_paddle(file, paddle)) return false;
+
+    if (!read_bricks(file, bricks)) {
+        clear_bricks(bricks);
         return false;
     }
 
-    data.clear();
-
-    if (!read_score(file, data.score)) {
-        data.clear();
-        return false;
-    }
-
-    if (!read_lives(file, data.lives)) {
-        data.clear();
-        return false;
-    }
-
-    if (!read_paddle(file, data.paddle)) {
-        data.clear();
-        return false;
-    }
-
-    if (!read_bricks(file, data.bricks)) {
-        data.clear();
-        return false;
-    }
-
-    if (!read_balls(file, data.balls)) {
-        data.clear();
+    if (!read_balls(file, balls)) {
+        clear_bricks(bricks);
         return false;
     }
 
@@ -437,53 +414,9 @@ Game::~Game()
     clear_bricks();
 }
 
-GameData::GameData(GameData&& other) noexcept
-    : score(other.score), lives(other.lives), paddle(other.paddle),
-      balls(std::move(other.balls)), bricks(std::move(other.bricks))
-{
-    other.bricks.clear();
-}
-
-GameData& GameData::operator=(GameData&& other) noexcept
-{
-    if (this != &other) {
-        clear();
-        score = other.score;
-        lives = other.lives;
-        paddle = other.paddle;
-        balls = std::move(other.balls);
-        bricks = std::move(other.bricks);
-        other.bricks.clear();
-    }
-
-    return *this;
-}
-
-GameData::~GameData()
-{
-    clear();
-}
-
-void GameData::clear()
-{
-    for (Brick* brick : bricks) {
-        delete brick;
-    }
-
-    bricks.clear();
-    balls.clear();
-    score = 0;
-    lives = 0;
-    paddle = Paddle();
-}
-
 void Game::clear_bricks()
 {
-    for (Brick* brick : bricks) {
-        delete brick;
-    }
-
-    bricks.clear();
+    ::clear_bricks(bricks);
 }
 
 bool Game::intersects(Square s1, Square s2)
@@ -578,17 +511,25 @@ bool Game::paddle_intersects_ball()
 
 bool Game::load(std::string const& filename)
 {
-    GameData data;
+    int new_score = 0;
+    int new_lives = 0;
+    Paddle new_paddle;
+    std::vector<Ball> new_balls;
+    std::vector<Brick*> new_bricks;
 
-    if (!load_file(filename, data)) return false;
+    if (!load_game_data(filename,
+                        new_score,
+                        new_lives,
+                        new_paddle,
+                        new_balls,
+                        new_bricks)) return false;
 
+    score = new_score;
+    lives = new_lives;
+    paddle = new_paddle;
+    balls = new_balls;
     clear_bricks();
-
-    score = data.score;
-    lives = data.lives;
-    paddle = data.paddle;
-    balls = data.balls;
-    bricks = std::move(data.bricks);
+    bricks = std::move(new_bricks);
 
     if (bricks_intersect()) return false;
     if (paddle_intersects_brick()) return false;
