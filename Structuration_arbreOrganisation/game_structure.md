@@ -19,9 +19,10 @@ Game::load
 │   ├── read_lives
 │   ├── read_paddle
 │   ├── read_bricks
-│   │   └── read_one_brick
+│   │   └── create_brick
+│   │       └── make_brick
 │   └── read_balls
-│       └── read_one_ball
+│       └── create_ball
 ├── 3. copier les données lues dans l'objet Game
 ├── 4. vérifier les collisions initiales
 │   ├── bricks_intersect
@@ -40,44 +41,53 @@ Game::load
 Game::load
 ├── load_game_data
 │   ├── read_score
-│   │   └── read_next_token
+│   │   ├── read_int
+│   │   │   └── read_next_token
 │   ├── read_lives
-│   │   └── read_next_token
+│   │   ├── read_int
+│   │   │   └── read_next_token
 │   ├── read_paddle
-│   │   ├── read_next_token
-│   │   ├── read_next_token
-│   │   ├── read_next_token
+│   │   ├── read_double
+│   │   │   └── read_next_token
+│   │   ├── read_double
+│   │   │   └── read_next_token
+│   │   ├── read_double
+│   │   │   └── read_next_token
 │   │   └── Paddle::is_valid
 │   ├── read_bricks
-│   │   ├── read_next_token
-│   │   └── read_one_brick
-│   │       ├── read_next_token
-│   │       ├── read_next_token
-│   │       ├── read_next_token
-│   │       ├── read_next_token
-│   │       ├── create_rainbow_brick
-│   │       │   ├── make_brick_body
-│   │       │   ├── RainbowBrick::is_hit_points_valid
-│   │       │   └── validate_brick
-│   │       │       ├── Brick::is_inside_arena
-│   │       │       └── Brick::is_size_valid
-│   │       ├── create_ball_brick
-│   │       │   ├── make_brick_body
-│   │       │   └── validate_brick
-│   │       └── create_split_brick
-│   │           ├── make_brick_body
-│   │           └── validate_brick
+│   │   ├── read_int
+│   │   │   └── read_next_token
+│   │   └── create_brick
+│   │       ├── read_int
+│   │       │   └── read_next_token
+│   │       ├── read_double
+│   │       │   └── read_next_token
+│   │       ├── read_double
+│   │       │   └── read_next_token
+│   │       ├── read_double
+│   │       │   └── read_next_token
+│   │       ├── make_brick
+│   │       │   ├── read_int
+│   │       │   │   └── read_next_token
+│   │       │   └── RainbowBrick::is_hit_points_valid
+│   │       ├── Brick::is_inside_arena
+│   │       └── Brick::is_size_valid
 │   └── read_balls
-│       ├── read_next_token
-│       └── read_one_ball
-│           ├── read_next_token
-│           ├── read_next_token
-│           ├── read_next_token
-│           ├── read_next_token
-│           ├── read_next_token
-│           └── validate_ball
-│               ├── Ball::is_inside_arena
-│               └── Ball::is_delta_valid
+│       ├── read_int
+│       │   └── read_next_token
+│       └── create_ball
+│           ├── read_double
+│           │   └── read_next_token
+│           ├── read_double
+│           │   └── read_next_token
+│           ├── read_double
+│           │   └── read_next_token
+│           ├── read_double
+│           │   └── read_next_token
+│           ├── read_double
+│           │   └── read_next_token
+│           ├── Ball::is_inside_arena
+│           └── Ball::is_delta_valid
 ├── Game::clear_bricks
 │   └── clear_bricks
 ├── Game::bricks_intersect
@@ -145,24 +155,24 @@ La partie briques est structurée comme ceci :
 read_bricks
 ├── lire nb_bricks
 └── boucle sur nb_bricks
-    └── read_one_brick
+    └── create_brick
         ├── lire type
         ├── lire x
         ├── lire y
         ├── lire c
-        ├── si type == RAINBOW
-        │   ├── lire hit_points
-        │   └── create_rainbow_brick
-        ├── si type == BALL
-        │   └── create_ball_brick
-        └── sinon
-            └── create_split_brick
+        ├── make_brick
+        │   ├── si type == RAINBOW
+        │   │   ├── lire hit_points
+        │   │   └── vérifier RainbowBrick::is_hit_points_valid
+        │   ├── si type == BALL
+        │   │   └── créer BallBrick
+        │   └── sinon
+        │       └── créer SplitBrick
+        ├── vérifier Brick::is_inside_arena
+        └── vérifier Brick::is_size_valid
 ```
 
-Ensuite chaque création appelle une validation adaptée :
-
-- `validate_brick`
-- et, pour les Rainbow bricks, `is_hit_points_valid`
+Ensuite la brique créée est validée directement dans `create_brick`.
 
 ---
 
@@ -174,20 +184,18 @@ La partie balles est structurée comme ceci :
 read_balls
 ├── lire nb_balls
 └── boucle sur nb_balls
-    └── read_one_ball
+    └── create_ball
         ├── lire x
         ├── lire y
         ├── lire r
         ├── lire dx
         ├── lire dy
         ├── construire Ball
-        └── validate_ball
+        ├── vérifier Ball::is_inside_arena
+        └── vérifier Ball::is_delta_valid
 ```
 
-La validation d'une balle teste :
-
-- `ball.is_inside_arena()`
-- `ball.is_delta_valid()`
+La validation d'une balle est faite directement dans `create_ball`.
 
 ---
 

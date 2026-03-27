@@ -170,4 +170,17 @@ GPT-5.4
 
 
 
+for f in tests/*.txt; do
+    echo "== $f =="
+    ./project "$f"
+done
 
+for f in test_mattew/*.txt; do
+    echo "== $f =="
+    ./project "$f"
+done
+
+for f in tests_rand/*.txt; do
+    echo "== $f =="
+    ./project "$f"
+done

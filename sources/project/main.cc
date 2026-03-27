@@ -1,3 +1,9 @@
+// main.cc  : point d'entree du programme
+//
+// Auteurs  : Liam Van Camp, Victor Henri Willy Eder
+// Version  : 1.0 du 27.03.2026
+//
+
 #include <iostream>
 
 #include "../model/game.h"
