@@ -38,10 +38,7 @@ Point normalized(Point p)
 
 bool is_inside(Circle c, Point p)
 {
-    if (distance(c.center, p) < c.radius - epsil_zero) {
-        return true;
-    }
-    return false;
+    return distance(c.center, p) < c.radius - epsil_zero;
 }
 
 bool is_inside(Square s, Point p)
@@ -51,11 +48,8 @@ bool is_inside(Square s, Point p)
     double ymin(s.center.y - s.half_size);
     double ymax(s.center.y + s.half_size);
 
-    if (p.x > xmin + epsil_zero && p.x < xmax - epsil_zero
-        && p.y > ymin + epsil_zero && p.y < ymax - epsil_zero) {
-        return true;
-    }
-    return false;
+    return p.x > xmin + epsil_zero && p.x < xmax - epsil_zero
+       && p.y > ymin + epsil_zero && p.y < ymax - epsil_zero;
 }
 
 bool intersects(Circle c1, Circle c2)
@@ -63,10 +57,7 @@ bool intersects(Circle c1, Circle c2)
     double d(distance(c1.center, c2.center));
     double gap(d - (c1.radius + c2.radius));
 
-    if (gap < epsil_zero) {
-        return true;
-    }
-    return false;
+    return gap < epsil_zero;
 }
 
 bool intersects(Square s1, Square s2)
@@ -81,10 +72,7 @@ bool intersects(Square s1, Square s2)
 
     double min_dist(std::sqrt(gap_x * gap_x + gap_y * gap_y));
 
-    if (min_dist < epsil_zero) {
-        return true;
-    }
-    return false;
+    return min_dist < epsil_zero;
 }
 
 bool intersects(Circle c, Square s)
@@ -100,8 +88,5 @@ bool intersects(Circle c, Square s)
     double d(distance(c.center, closest));
     double gap(d - c.radius);
 
-    if (gap < epsil_zero) {
-        return true;
-    }
-    return false;
+    return gap < epsil_zero;
 }
