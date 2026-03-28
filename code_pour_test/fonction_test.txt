@@ -184,3 +184,26 @@ for f in tests_rand/*.txt; do
     echo "== $f =="
     ./project "$f"
 done
+
+       compare_tests() {
+        for f in ../tests/t*.txt; do
+            nom=$(basename "$f" .txt)
+            attendu=$(sed -n 's/^# output: "\(.*\)"$/\1/p' "$f")
+            obtenu=$(./project "$f" 2>&1)
+
+            echo "$nom"
+            echo "attendu : $attendu"
+            echo "obtenu  : $obtenu"
+
+            if [ "$obtenu" = "$attendu" ]; then
+                echo "OK"
+            else
+                echo "NOP"
+            fi
+
+            echo
+        done
+        }
+
+
+        compare_tests

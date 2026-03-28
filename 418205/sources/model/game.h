@@ -27,11 +27,6 @@ private:
     // libere les briques actuellement stockees dans Game.
     void clear_bricks();
 
-    // versions strictes des tests d'intersection pour la validation initiale
-    bool intersects(Square s1, Square s2);
-    bool intersects(Circle c1, Circle c2);
-    bool intersects(Circle c, Square s);
-
     // detection des intersections initiales entre les entites
     bool bricks_intersect();
     bool paddle_intersects_brick();

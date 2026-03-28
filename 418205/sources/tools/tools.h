@@ -60,10 +60,10 @@ Point normalized(Point p);
 
 
 // inclusion et intersection
-bool is_inside(Circle c, Point p);
-bool is_inside(Square s, Point p);
+bool is_inside(Circle c, Point p, double eps = 0.0);
+bool is_inside(Square s, Point p, double eps = 0.0);
 
-bool intersects(Circle c1, Circle c2);
-bool intersects(Square s1, Square s2);
-bool intersects(Circle c, Square s);
+bool intersects(Circle c1, Circle c2, double eps = 0.0);
+bool intersects(Square s1, Square s2, double eps = 0.0);
+bool intersects(Circle c, Square s, double eps = 0.0);
 #endif

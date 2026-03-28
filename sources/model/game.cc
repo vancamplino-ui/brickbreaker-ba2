@@ -55,40 +55,11 @@ void Game::clear_bricks()
     ::clear_bricks(bricks);
 }
 
-bool Game::intersects(Square s1, Square s2)
-{
-    double dx(std::abs(s1.center.x - s2.center.x)
-          - (s1.half_size + s2.half_size));
-    double dy(std::abs(s1.center.y - s2.center.y)
-          - (s1.half_size + s2.half_size));
-    return dx < 0.0 && dy < 0.0;
-}
-
-bool Game::intersects(Circle c1, Circle c2)
-{
-    double d(distance(c1.center, c2.center));
-    double gap(d - (c1.radius + c2.radius));
-    return gap < 0.0;
-}
-
-bool Game::intersects(Circle c, Square s)
-{
-    Point min{s.center.x - s.half_size, s.center.y - s.half_size};
-    Point max{s.center.x + s.half_size, s.center.y + s.half_size};
-    Point closest{
-        std::clamp(c.center.x, min.x, max.x),
-        std::clamp(c.center.y, min.y, max.y)
-    };
-    double d(distance(c.center, closest));
-    double gap(d - c.radius);
-    return gap < 0.0;
-}
-
 bool Game::bricks_intersect()
 {
     for (size_t i = 0; i < bricks.size(); ++i) {
         for (size_t j = i + 1; j < bricks.size(); ++j) {
-            if (intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
+            if (::intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
                 std::cout << message::collision_bricks(i, j);
                 return true;
             }
@@ -100,7 +71,7 @@ bool Game::bricks_intersect()
 bool Game::paddle_intersects_brick()
 {
     for (size_t i = 0; i < bricks.size(); ++i) {
-        if (intersects(paddle.getArc(), bricks[i]->getBody())) {
+        if (::intersects(paddle.getArc(), bricks[i]->getBody())) {
             std::cout << message::collision_paddle_brick(i);
             return true;
         }
@@ -112,7 +83,7 @@ bool Game::balls_intersect()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = i + 1; j < balls.size(); ++j) {
-            if (intersects(balls[i].getBody(), balls[j].getBody())) {
+            if (::intersects(balls[i].getBody(), balls[j].getBody())) {
                 std::cout << message::collision_balls(i, j);
                 return true;
             }
@@ -125,7 +96,7 @@ bool Game::ball_intersects_brick()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = 0; j < bricks.size(); ++j) {
-            if (intersects(balls[i].getBody(), bricks[j]->getBody())) {
+            if (::intersects(balls[i].getBody(), bricks[j]->getBody())) {
                 std::cout << message::collision_ball_brick(i, j);
                 return true;
             }
@@ -137,7 +108,7 @@ bool Game::ball_intersects_brick()
 bool Game::paddle_intersects_ball()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
-        if (intersects(paddle.getArc(), balls[i].getBody())) {
+        if (::intersects(paddle.getArc(), balls[i].getBody())) {
             std::cout << message::collision_paddle_ball(i);
             return true;
         }
