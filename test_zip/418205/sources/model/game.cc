@@ -1,0 +1,385 @@
+// game.cc  : lecture du fichier de jeu et validations initiales
+//
+// Auteurs  : Liam Van Camp, Victor Henri Willy Eder
+// Version  : 1.0 du 27.03.2026
+//
+
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <utility>
+
+#include "game.h"
+#include "message.h"
+#include "../tools/tools.h"
+#include "../tools/constants.h"
+
+namespace
+{
+    // Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
+    // la classe Game avec de nombreuses methodes qui ne servent qu'a load().
+    
+    bool read_next_token(std::ifstream& file, std::string& token);
+    bool read_int(std::ifstream& file, int& value);
+    bool read_double(std::ifstream& file, double& value);
+    void clear_bricks(std::vector<Brick*>& bricks);
+    bool read_score(std::ifstream& file, int& score);
+    bool read_lives(std::ifstream& file, int& lives);
+    bool read_paddle(std::ifstream& file, Paddle& paddle);
+    Brick* make_brick(std::ifstream& file, int type, double x, double y, double c);
+    bool create_brick(std::ifstream& file, std::vector<Brick*>& bricks);
+    bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks);
+    bool create_ball(std::ifstream& file, std::vector<Ball>& balls);
+    bool read_balls(std::ifstream& file, std::vector<Ball>& balls);
+    bool load_game_data(std::string const& filename,
+                        int& score,
+                        int& lives,
+                        Paddle& paddle,
+                        std::vector<Ball>& balls,
+                        std::vector<Brick*>& bricks);
+} // namespace
+
+Game::Game()
+    : score(0), lives(0), paddle(), balls(), bricks()
+{
+}
+
+Game::~Game()
+{
+    clear_bricks();
+}
+
+
+void Game::clear_bricks()
+{
+    ::clear_bricks(bricks);
+}
+
+bool Game::bricks_intersect()
+{
+    for (size_t i = 0; i < bricks.size(); ++i) {
+        for (size_t j = i + 1; j < bricks.size(); ++j) {
+            if (::intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
+                std::cout << message::collision_bricks(i, j);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Game::paddle_intersects_brick()
+{
+    for (size_t i = 0; i < bricks.size(); ++i) {
+        if (::intersects(paddle.getArc(), bricks[i]->getBody())) {
+            std::cout << message::collision_paddle_brick(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Game::balls_intersect()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        for (size_t j = i + 1; j < balls.size(); ++j) {
+            if (::intersects(balls[i].getBody(), balls[j].getBody())) {
+                std::cout << message::collision_balls(i, j);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Game::ball_intersects_brick()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        for (size_t j = 0; j < bricks.size(); ++j) {
+            if (::intersects(balls[i].getBody(), bricks[j]->getBody())) {
+                std::cout << message::collision_ball_brick(i, j);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Game::paddle_intersects_ball()
+{
+    for (size_t i = 0; i < balls.size(); ++i) {
+        if (::intersects(paddle.getArc(), balls[i].getBody())) {
+            std::cout << message::collision_paddle_ball(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool Game::load(std::string const& filename)
+{
+    int new_score = 0;
+    int new_lives = 0;
+    Paddle new_paddle;
+    std::vector<Ball> new_balls;
+    std::vector<Brick*> new_bricks;
+
+    if (!load_game_data(filename,
+                        new_score,
+                        new_lives,
+                        new_paddle,
+                        new_balls,
+                        new_bricks)) return false;
+
+    score = new_score;
+    lives = new_lives;
+    paddle = new_paddle;
+    balls = new_balls;
+    clear_bricks();
+    bricks = std::move(new_bricks);
+
+    if (bricks_intersect()) return false;
+    if (paddle_intersects_brick()) return false;
+    if (balls_intersect()) return false;
+    if (ball_intersects_brick()) return false;
+    if (paddle_intersects_ball()) return false;
+
+    std::cout << message::success();
+    return true;
+}
+
+namespace
+{
+    bool read_next_token(std::ifstream& file, std::string& token)
+    {
+        while (file >> token) {
+            if (!token.empty() && token[0] == '#') {
+                std::string rest;
+                std::getline(file, rest);
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool read_int(std::ifstream& file, int& value)
+    {
+        std::string token;
+
+        if (!read_next_token(file, token)) return false;
+
+        value = std::stoi(token);
+        return true;
+    }
+
+    bool read_double(std::ifstream& file, double& value)
+    {
+        std::string token;
+
+        if (!read_next_token(file, token)) return false;
+
+        value = std::stod(token);
+        return true;
+    }
+
+    void clear_bricks(std::vector<Brick*>& bricks)
+    {
+        for (Brick* brick : bricks) {
+            delete brick;
+        }
+
+        bricks.clear();
+    }
+
+    bool read_score(std::ifstream& file, int& score)
+    {
+        if (!read_int(file, score)) return false;
+
+        if (score < 0) {
+            std::cout << message::invalid_score(score);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool read_lives(std::ifstream& file, int& lives)
+    {
+        if (!read_int(file, lives)) return false;
+
+        if (lives < 0) {
+            std::cout << message::invalid_lives(lives);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool read_paddle(std::ifstream& file, Paddle& paddle)
+    {
+        double x = 0.0;
+        double y = 0.0;
+        double r = 0.0;
+
+        if (!read_double(file, x)) return false;
+        if (!read_double(file, y)) return false;
+        if (!read_double(file, r)) return false;
+
+        paddle = Paddle({x, y}, r);
+
+        if (!paddle.is_valid()) {
+            std::cout << message::paddle_outside(x, y);
+            return false;
+        }
+
+        return true;
+    }
+
+    Brick* make_brick(std::ifstream& file, int type, double x, double y, double c)
+    {
+        if (type == RAINBOW) {
+            int hit_points = 0;
+
+            if (!read_int(file, hit_points)) return nullptr;
+            RainbowBrick* brick = new RainbowBrick({{x, y}, c / 2.0}, hit_points);
+
+            if (!brick->is_hit_points_valid()) {
+                std::cout << message::invalid_hit_points(hit_points);
+                delete brick;
+                return nullptr;
+            }
+
+            return brick;
+        }
+
+        if (type == BALL) return new BallBrick({{x, y}, c / 2.0});
+        return new SplitBrick({{x, y}, c / 2.0});
+    }
+
+    bool create_brick(std::ifstream& file, std::vector<Brick*>& bricks)
+    {
+        int type = 0;
+        double x = 0.0;
+        double y = 0.0;
+        double c = 0.0;
+
+        if (!read_int(file, type)) return false;
+        if (!read_double(file, x)) return false;
+        if (!read_double(file, y)) return false;
+        if (!read_double(file, c)) return false;
+
+        if (type < RAINBOW || type > SPLIT) {
+            std::cout << message::invalid_brick_type(type);
+            return false;
+        }
+
+        Brick* brick = make_brick(file, type, x, y, c);
+
+        if (brick == nullptr) return false;
+
+        if (!brick->is_inside_arena()) {
+            std::cout << message::brick_outside(x, y);
+            delete brick;
+            return false;
+        }
+
+        if (!brick->is_size_valid()) {
+            std::cout << message::invalid_brick_size(c);
+            delete brick;
+            return false;
+        }
+
+        bricks.push_back(brick);
+        return true;
+    }
+
+    bool read_bricks(std::ifstream& file, std::vector<Brick*>& bricks)
+    {
+        int nb_bricks = 0;
+
+        if (!read_int(file, nb_bricks)) return false;
+        if (nb_bricks < 0) return false;
+
+        for (int i = 0; i < nb_bricks; ++i) {
+            if (!create_brick(file, bricks)) return false;
+        }
+
+        return true;
+    }
+
+    bool create_ball(std::ifstream& file, std::vector<Ball>& balls)
+    {
+        double x = 0.0;
+        double y = 0.0;
+        double r = 0.0;
+        double dx = 0.0;
+        double dy = 0.0;
+
+        if (!read_double(file, x)) return false;
+        if (!read_double(file, y)) return false;
+        if (!read_double(file, r)) return false;
+        if (!read_double(file, dx)) return false;
+        if (!read_double(file, dy)) return false;
+
+        Ball ball({{x, y}, r}, {dx, dy});
+
+        if (!ball.is_inside_arena()) {
+            std::cout << message::ball_outside(x, y);
+            return false;
+        }
+
+        if (!ball.is_delta_valid()) {
+            std::cout << message::invalid_delta(dx, dy);
+            return false;
+        }
+
+        balls.push_back(ball);
+        return true;
+    }
+
+    bool read_balls(std::ifstream& file, std::vector<Ball>& balls)
+    {
+        int nb_balls = 0;
+
+        if (!read_int(file, nb_balls)) return false;
+        if (nb_balls < 0) return false;
+
+        for (int i = 0; i < nb_balls; ++i) {
+            if (!create_ball(file, balls)) return false;
+        }
+
+        return true;
+    }
+
+    bool load_game_data(std::string const& filename,
+                        int& score,
+                        int& lives,
+                        Paddle& paddle,
+                        std::vector<Ball>& balls,
+                        std::vector<Brick*>& bricks)
+    {
+        std::ifstream file(filename);
+
+        if (!file) return false;
+
+        if (!read_score(file, score)) return false;
+        if (!read_lives(file, lives)) return false;
+        if (!read_paddle(file, paddle)) return false;
+
+        if (!read_bricks(file, bricks)) {
+            clear_bricks(bricks);
+            return false;
+        }
+
+        if (!read_balls(file, balls)) {
+            clear_bricks(bricks);
+            return false;
+        }
+
+        return true;
+    }
+} // namespace

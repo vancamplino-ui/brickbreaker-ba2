@@ -5,9 +5,6 @@
 CXX      = g++
 CXXFLAGS = -g -Wall -Wextra -pedantic -std=c++17
 
-LINKING = `pkg-config --cflags gtkmm-4.0`
-LDLIBS  = `pkg-config --libs gtkmm-4.0`
-
 CXXFILES = \
 	sources/project/main.cc \
 	sources/model/game.cc \
@@ -26,21 +23,12 @@ OFILES = \
 	sources/model/message.o \
 	sources/tools/tools.o
 
-GUI_OFILES = \
-	sources/project/main_gui.o \
-	sources/gui/main_window.o \
-	sources/graphic/graphic_area.o
-
 # ============================================================
 # Definition de la premiere regle
 # ============================================================
 
 project: $(OFILES)
 	$(CXX) $(CXXFLAGS) $(OFILES) -o project
-
-project_gui: $(GUI_OFILES)
-	@echo " *** EDITION DES LIENS project_gui ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) $(GUI_OFILES) -o project_gui $(LDLIBS)
 
 # ============================================================
 # Definitions de cibles particulieres
@@ -56,20 +44,8 @@ depend:
 
 clean:
 	@echo " *** EFFACE MODULES OBJET ET EXECUTABLE ***"
-	@/bin/rm -f sources/*/*.o project project_gui
+	@/bin/rm -f sources/*/*.o project
 	@/bin/rm -f *~ sources/*/*~ sources/*/*~
-
-sources/project/main_gui.o: sources/project/main_gui.cc sources/gui/main_window.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
-
-sources/gui/main_window.o: sources/gui/main_window.cc sources/gui/main_window.h sources/graphic/graphic_area.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
-
-sources/graphic/graphic_area.o: sources/graphic/graphic_area.cc sources/graphic/graphic_area.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
 
 #
 # -- Regles de dependances generees automatiquement

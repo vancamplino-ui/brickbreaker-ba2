@@ -207,3 +207,7 @@ done
 
 
         compare_tests
+
+
+        zip -r -X 418205_399006.zip 418205 \
+-x "*.DS_Store" "__MACOSX/*" "*.o" "project" "*/.git/*"

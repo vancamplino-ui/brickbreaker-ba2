@@ -1,3 +1,7 @@
 project
+/project_gui
+compile_commands.json
+!sources/project/
+!sources/project/*.cc
 *.o
 .DS_Store
