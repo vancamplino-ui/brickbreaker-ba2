@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
+
 #include "constants.h"
 #include "graphic_gui.h"
 #include "gui.h"
@@ -148,9 +150,9 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
 
 void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 {
-    dialog->set_modal(true);
+    dialog->set_modal(true); // block the main window until the dialog is closed
     dialog->set_transient_for(*this);
-    dialog->set_select_multiple(false);
+    dialog->set_select_multiple(false);//interdit la séléction multiple de fichiers 
     dialog->signal_response().connect(
         sigc::bind(sigc::mem_fun(*this, &My_window::dialog_response), dialog));
 
@@ -198,7 +200,13 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
     case OPEN_FILE:
         if (file_name != "")
         {
-            cout << "open file " << file_name << endl; // TODO: set game from a file
+            cout << "open file " << file_name << endl; 
+            game.reset();
+            if (!(game.load(file_name.string()))) {
+                game.reset();
+            }
+            update_infos();
+            drawing.queue_draw();
             dialog->hide();
         }
         break;
@@ -240,12 +248,11 @@ void My_window::set_infos()
 }
 
 void My_window::update_infos()
-// TODO: update the different counters
 {
-    for (auto &value : info_value)
-    {
-        value.set_text("0");
-    }
+    info_value[0].set_text(to_string(game.get_score()));
+    info_value[1].set_text(to_string(game.get_lives()));
+    info_value[2].set_text(to_string(game.get_bricks().size()));
+    info_value[3].set_text(to_string(game.get_balls().size()));
 }
 
 void My_window::set_drawing()
@@ -258,7 +265,7 @@ void My_window::set_drawing()
 void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     graphic_set_context(cr);
-    double side(min(width, height));
+    double side(std::min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
     // TODO: draw the game

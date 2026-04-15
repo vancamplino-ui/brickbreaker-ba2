@@ -18,6 +18,7 @@ CXXFILES := \
 	sources/model/paddle.cc \
 	sources/model/message.cc \
 	sources/tools/tools.cc
+	
 OFILES   := $(addprefix $(BUILD_DIR)/, $(CXXFILES:.cc=.o))
 
 .PHONY: all clean tests

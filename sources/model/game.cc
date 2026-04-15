@@ -149,6 +149,40 @@ bool Game::load(std::string const& filename)
     return true;
 }
 
+void Game::reset()
+{
+    score = 0;
+    lives = 0;
+    paddle = Paddle();
+    balls.clear();
+    clear_bricks();
+}
+
+int Game::get_score() const
+{
+    return score;
+}
+
+int Game::get_lives() const
+{
+    return lives;
+}
+
+Paddle const& Game::get_paddle() const
+{
+    return paddle;
+}
+
+std::vector<Ball> const& Game::get_balls() const
+{
+    return balls;
+}
+
+std::vector<Brick*> const& Game::get_bricks() const
+{
+    return bricks;
+}
+
 namespace
 {
     bool read_next_token(std::ifstream& file, std::string& token)

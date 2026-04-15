@@ -22,21 +22,27 @@ public:
     ~Game();
 
     bool load(std::string const& filename);
+    void reset();
+    int get_score() const;
+    int get_lives() const;
+    Paddle const& get_paddle() const;
+    std::vector<Ball> const& get_balls() const;
+    std::vector<Brick*> const& get_bricks() const;
 
 private:
+    // métodes privées de game
     // libere les briques actuellement stockees dans Game.
     void clear_bricks();
-
     // detection des intersections initiales entre les entites
     bool bricks_intersect();
     bool paddle_intersects_brick();
     bool balls_intersect();
     bool ball_intersects_brick();
     bool paddle_intersects_ball();
-
+   
+    // déclaration des attributs
     int score;
     int lives;
-
     Paddle paddle;
     std::vector<Ball> balls;
     // pointeurs necessaires pour stocker plusieurs types derives de Brick (R3)

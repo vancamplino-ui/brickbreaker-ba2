@@ -5,13 +5,13 @@
 //
 
 #include <gtkmm/application.h>
-#include "gui.h"
+#include <string>
 
-using namespace std;
+#include "gui.h"
 
 int main(int argc, char *argv[])
 {
-    string file_name("");
+    std::string file_name("");
     if (argc > 1)
     {
         file_name = argv[1];

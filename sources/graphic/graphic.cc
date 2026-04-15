@@ -1,8 +1,6 @@
 #include "graphic.h"
 #include "graphic_gui.h"
 
-using namespace std;
-
 static const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
 // graphic_gui.h

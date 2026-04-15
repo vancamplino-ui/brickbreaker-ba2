@@ -5,6 +5,7 @@
 #include <gtkmm.h>
 #include <string>
 
+#include "../model/game.h"
 
 class My_window : public Gtk::Window
 {
@@ -20,6 +21,7 @@ private:
     Gtk::Frame info_frame;
     std::array<Gtk::Label, 4> info_text, info_value;
     Gtk::DrawingArea drawing;
+    Game game;
 
     void set_commands();
 
