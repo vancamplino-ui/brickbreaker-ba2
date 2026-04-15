@@ -1,93 +1,43 @@
-# ============================================================
-# Definitions de macros
-# ============================================================
+OUT      := project
+CXX      := g++
+CXXFLAGS := -Wall -std=c++17
+PKGS     := gtkmm-4.0
+LINKING  := $(shell pkg-config --cflags $(PKGS))
+LDLIBS   := $(shell pkg-config --libs $(PKGS))
+INCLUDES := -Isources/gui -Isources/graphic -Isources/tools -Isources/model
 
-CXX      = g++
-CXXFLAGS = -g -Wall -Wextra -pedantic -std=c++17
+BUILD_DIR := build
 
-LINKING = `pkg-config --cflags gtkmm-4.0`
-LDLIBS  = `pkg-config --libs gtkmm-4.0`
-
-CXXFILES = \
-	sources/project/main.cc \
+CXXFILES := \
+	sources/graphic/graphic.cc \
+	sources/project/project.cc \
+	sources/gui/gui.cc \
 	sources/model/game.cc \
 	sources/model/ball.cc \
 	sources/model/brick.cc \
 	sources/model/paddle.cc \
 	sources/model/message.cc \
 	sources/tools/tools.cc
+OFILES   := $(addprefix $(BUILD_DIR)/, $(CXXFILES:.cc=.o))
 
-OFILES = \
-	sources/project/main.o \
-	sources/model/game.o \
-	sources/model/ball.o \
-	sources/model/brick.o \
-	sources/model/paddle.o \
-	sources/model/message.o \
-	sources/tools/tools.o
+.PHONY: all clean tests
 
-GUI_OFILES = \
-	sources/project/main_gui.o \
-	sources/gui/main_window.o \
-	sources/graphic/graphic_area.o
+all: $(OUT)
 
-# ============================================================
-# Definition de la premiere regle
-# ============================================================
+$(BUILD_DIR)/%.o: %.cc
+	@mkdir -p "$$(dirname $@)"
+	@echo "Compiling $<..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(LINKING) -c $< -o $@
 
-project: $(OFILES)
-	$(CXX) $(CXXFLAGS) $(OFILES) -o project
-
-project_gui: $(GUI_OFILES)
-	@echo " *** EDITION DES LIENS project_gui ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) $(GUI_OFILES) -o project_gui $(LDLIBS)
-
-# ============================================================
-# Definitions de cibles particulieres
-# ============================================================
-
-depend:
-	@echo " *** MISE A JOUR DES DEPENDANCES ***"
-	@(sed '/^# DO NOT DELETE THIS LINE/q' Makefile && \
-	  $(CXX) -MM $(CXXFLAGS) $(CXXFILES) | \
-	  egrep -v "/usr/include" \
-	 ) >Makefile.new
-	@mv Makefile.new Makefile
+$(OUT): $(OFILES)
+	@$(CXX) $(CXXFLAGS) $(LINKING) $^ -o $@ $(LDLIBS)
 
 clean:
-	@echo " *** EFFACE MODULES OBJET ET EXECUTABLE ***"
-	@/bin/rm -f sources/*/*.o project project_gui
-	@/bin/rm -f *~ sources/*/*~ sources/*/*~
+	@echo "Cleaning project..."
+	@rm -rf $(BUILD_DIR) $(OUT)
 
-sources/project/main_gui.o: sources/project/main_gui.cc sources/gui/main_window.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
-
-sources/gui/main_window.o: sources/gui/main_window.cc sources/gui/main_window.h sources/graphic/graphic_area.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
-
-sources/graphic/graphic_area.o: sources/graphic/graphic_area.cc sources/graphic/graphic_area.h
-	@echo " *** COMPILATION $< ***"
-	@$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@
-
-#
-# -- Regles de dependances generees automatiquement
-#
-# DO NOT DELETE THIS LINE
-main.o: sources/project/main.cc sources/project/../model/game.h \
-  sources/project/../model/paddle.h \
-  sources/project/../model/../tools/tools.h \
-  sources/project/../model/../tools/constants.h \
-  sources/project/../model/ball.h sources/project/../model/brick.h
-game.o: sources/model/game.cc sources/model/game.h sources/model/paddle.h \
-  sources/model/../tools/tools.h sources/model/../tools/constants.h \
-  sources/model/ball.h sources/model/brick.h sources/model/message.h
-ball.o: sources/model/ball.cc sources/model/ball.h \
-  sources/model/../tools/tools.h sources/model/../tools/constants.h
-brick.o: sources/model/brick.cc sources/model/brick.h \
-  sources/model/../tools/tools.h sources/model/../tools/constants.h
-paddle.o: sources/model/paddle.cc sources/model/paddle.h \
-  sources/model/../tools/tools.h sources/model/../tools/constants.h
-message.o: sources/model/message.cc sources/model/message.h
-tools.o: sources/tools/tools.cc sources/tools/tools.h
+tests: $(OUT)
+	@for test in $$(ls tests); do \
+		echo "Running $$test..."; \
+		./$(OUT) tests/$$test; \
+	done
