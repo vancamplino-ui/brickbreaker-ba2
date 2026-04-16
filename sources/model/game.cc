@@ -37,6 +37,11 @@ namespace
                         Paddle& paddle,
                         std::vector<Ball>& balls,
                         std::vector<Brick*>& bricks);
+    void write_score(std::ofstream& file, int score);
+    void write_lives(std::ofstream& file, int lives);
+    void write_paddle(std::ofstream& file, Paddle const& paddle);
+    void write_bricks(std::ofstream& file, std::vector<Brick*> const& bricks);
+    void write_balls(std::ofstream& file, std::vector<Ball> const& balls);
 } // namespace
 
 Game::Game()
@@ -147,6 +152,19 @@ bool Game::load(std::string const& filename)
 
     std::cout << message::success();
     return true;
+}
+
+void Game::save(std::string const& filename) const
+{
+    std::ofstream file(filename);
+
+    if (!file) return;
+
+    write_score(file, score);
+    write_lives(file, lives);
+    write_paddle(file, paddle);
+    write_bricks(file, bricks);
+    write_balls(file, balls);
 }
 
 void Game::reset()
@@ -415,5 +433,71 @@ namespace
         }
 
         return true;
+    }
+
+    void write_score(std::ofstream& file, int score)
+    {
+        file << "# score\n";
+        file << score << "\n\n";
+    }
+
+    void write_lives(std::ofstream& file, int lives)
+    {
+        file << "# lives\n";
+        file << lives << "\n\n";
+    }
+
+    void write_paddle(std::ofstream& file, Paddle const& paddle)
+    {
+        Circle paddle_arc = paddle.getArc();
+
+        file << "# paddle\n";
+        file << paddle_arc.center.x << ' '
+             << paddle_arc.center.y << ' '
+             << paddle_arc.radius << "\n\n";
+    }
+
+    void write_bricks(std::ofstream& file, std::vector<Brick*> const& bricks)
+    {
+        file << "# bricks\n";
+        file << bricks.size() << '\n';
+
+        for (Brick const* brick : bricks) {
+            Square body = brick->getBody();
+            double size = 2.0 * body.half_size;
+
+            file << brick->getType() << ' '
+                 << body.center.x << ' '
+                 << body.center.y << ' '
+                 << size;
+
+            if (brick->getType() == RAINBOW) {
+                RainbowBrick const* rainbow =
+                    dynamic_cast<RainbowBrick const*>(brick);
+
+                if (rainbow != nullptr) {
+                    file << ' ' << rainbow->getHitPoints();
+                }
+            }
+
+            file << '\n';
+        }
+    }
+
+    void write_balls(std::ofstream& file, std::vector<Ball> const& balls)
+    {
+        file << "\n# balls\n";
+        file << balls.size() << '\n';
+
+        for (Ball const& ball : balls) {
+            Circle body = ball.getBody();
+            Point delta = ball.getDelta();
+
+            file << body.center.x << ' '
+                 << body.center.y << ' '
+                 << body.radius << ' '
+                 << delta.x << ' '
+                 << delta.y << '\n';
+        }
     }
 } // namespace

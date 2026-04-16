@@ -213,7 +213,8 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
     case SAVE_FILE:
         if (file_name != "")
         {
-            cout << "save file " << file_name << endl; // TODO: save the game
+            cout << "save file " << file_name << endl;
+            game.save(file_name.string()); 
             dialog->hide();
         }
         break;
