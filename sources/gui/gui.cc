@@ -32,7 +32,8 @@ My_window::My_window(string file_name)
       buttons({Gtk::Button("exit"), Gtk::Button("open"), Gtk::Button("save"),
                Gtk::Button("restart"), Gtk::Button("start"), Gtk::Button("step")}),
       info_frame("Infos :"), info_text({Gtk::Label("score:"), Gtk::Label("lives:"),
-                                        Gtk::Label("bricks:"), Gtk::Label("balls:")})
+                                        Gtk::Label("bricks:"), Gtk::Label("balls:")}),
+      current_file_name(file_name)
 {
     set_title("Brick Breaker");
     set_child(main_box);
@@ -46,7 +47,16 @@ My_window::My_window(string file_name)
     set_mouse_controller();
     set_infos();
     set_drawing();
-    // TODO: set the game
+
+    if (!current_file_name.empty()) {
+        game.reset();
+        if (!game.load(current_file_name)) {
+            game.reset();
+        }
+    }
+
+    update_infos();
+    drawing.queue_draw();
 }
 void My_window::set_commands()
 {
@@ -89,7 +99,16 @@ void My_window::save_clicked()
 }
 void My_window::restart_clicked()
 {
-    cout << __func__ << endl; // TODO: reset the game from the last read file
+    cout << __func__ << endl; 
+      if (current_file_name.empty()) return;
+
+    game.reset();
+    if (!game.load(current_file_name)) {
+        game.reset();
+    }
+
+    update_infos();
+    drawing.queue_draw();
 }
 void My_window::start_clicked()
 {
@@ -117,10 +136,14 @@ void My_window::start_clicked()
         buttons[START].set_label("stop");
         buttons[STEP].set_sensitive(false);
     }
+
 }
 void My_window::step_clicked()
 {
-    cout << __func__ << endl; // TODO: make a single update
+    cout << __func__ << endl; 
+    game.update();
+    update_infos();
+    drawing.queue_draw();
 }
 void My_window::set_key_controller()
 {
@@ -181,53 +204,69 @@ void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 
     dialog->show();
 }
+void My_window::handle_open_file(std::filesystem::path const& file_name,
+                                 Gtk::FileChooserDialog *dialog)
+{
+    if (file_name == "") return;
+
+    cout << "open file " << file_name << endl;
+
+    game.reset();
+    if (game.load(file_name.string())) {
+        current_file_name = file_name.string();
+    } else {
+        game.reset();
+    }
+
+    update_infos();
+    drawing.queue_draw();
+    dialog->hide();
+}
+
+void My_window::handle_save_file(std::filesystem::path const& file_name,
+                                 Gtk::FileChooserDialog *dialog)
+{
+    if (file_name == "") return;
+
+    cout << "save file " << file_name << endl;
+    game.save(file_name.string());
+    dialog->hide();
+}
 void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 {
     filesystem::path file_name = "";
-    if (dialog->get_file())
-    {
+    if (dialog->get_file()) {
         file_name = dialog->get_file()->get_path();
-        if (file_name.extension() != ".txt")
-        {
+        if (file_name.extension() != ".txt") {
             file_name = "";
         }
     }
+
     switch (response)
     {
     case CANCEL:
         dialog->hide();
         break;
+
     case OPEN_FILE:
-        if (file_name != "")
-        {
-            cout << "open file " << file_name << endl; 
-            game.reset();
-            if (!(game.load(file_name.string()))) {
-                game.reset();
-            }
-            update_infos();
-            drawing.queue_draw();
-            dialog->hide();
-        }
+        handle_open_file(file_name, dialog);
         break;
+
     case SAVE_FILE:
-        if (file_name != "")
-        {
-            cout << "save file " << file_name << endl;
-            game.save(file_name.string()); 
-            dialog->hide();
-        }
+        handle_save_file(file_name, dialog);
         break;
+
     default:
         break;
     }
 }
-
 bool My_window::loop()
 {
     if (loop_activated)
     {
-        // TODO: update the game and the interface
+        game.update();
+        update_infos();
+        drawing.queue_draw();
         return true;
     }
     return false;

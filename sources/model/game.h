@@ -23,6 +23,7 @@ public:
 
     bool load(std::string const& filename);
     void save(std::string const& filename) const;
+    void update();
     void reset();
     int get_score() const;
     int get_lives() const;

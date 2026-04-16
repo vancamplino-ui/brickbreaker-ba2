@@ -167,6 +167,10 @@ void Game::save(std::string const& filename) const
     write_balls(file, balls);
 }
 
+void Game::update()
+{
+}
+
 void Game::reset()
 {
     score = 0;

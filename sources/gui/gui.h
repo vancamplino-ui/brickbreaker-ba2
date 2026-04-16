@@ -2,6 +2,7 @@
 #define GUI_H
 
 #include <array>
+#include <filesystem>
 #include <gtkmm.h>
 #include <string>
 
@@ -22,6 +23,7 @@ private:
     std::array<Gtk::Label, 4> info_text, info_value;
     Gtk::DrawingArea drawing;
     Game game;
+    std::string current_file_name;
 
     void set_commands();
 
@@ -37,6 +39,10 @@ private:
 
     void set_dialog(Gtk::FileChooserDialog *dialog);
     void dialog_response(int response, Gtk::FileChooserDialog *dialog);
+    void handle_open_file(std::filesystem::path const& file_name,
+                          Gtk::FileChooserDialog *dialog);
+    void handle_save_file(std::filesystem::path const& file_name,
+                          Gtk::FileChooserDialog *dialog);
 
     bool loop();
 
