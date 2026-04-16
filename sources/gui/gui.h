@@ -43,6 +43,7 @@ private:
                           Gtk::FileChooserDialog *dialog);
     void handle_save_file(std::filesystem::path const& file_name,
                           Gtk::FileChooserDialog *dialog);
+    void stop_loop();
 
     bool loop();
 

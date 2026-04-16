@@ -124,7 +124,7 @@ void My_window::start_clicked()
         buttons[START].set_label("start");
         buttons[STEP].set_sensitive(true);
     }
-    else // TODO: only if the game is not finished
+    else if (!game.is_finished())
     {
         loop_conn =
             Glib::signal_timeout().connect(sigc::mem_fun(*this, &My_window::loop), dt);
@@ -135,6 +135,12 @@ void My_window::start_clicked()
         buttons[RESTART].set_sensitive(false);
         buttons[START].set_label("stop");
         buttons[STEP].set_sensitive(false);
+    }
+    else
+    {
+        loop_activated = false;
+        buttons[START].set_label("start");
+
     }
 
 }
@@ -157,13 +163,13 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
     switch (keyval)
     {
     case '1':
-        // TODO: make a single update
+        step_clicked();
         return true;
     case 's':
-        // TODO: pause or unpause the game
+        start_clicked();
         return true;
     case 'r':
-        // TODO: reset the game from the last read file
+        restart_clicked();
         return true;
     default:
         break;
@@ -260,16 +266,37 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         break;
     }
 }
+
+void My_window::stop_loop()
+{
+    loop_activated = false;
+    buttons[EXIT].set_sensitive(true);
+    buttons[OPEN].set_sensitive(true);
+    buttons[SAVE].set_sensitive(true);
+    buttons[RESTART].set_sensitive(true);
+    buttons[START].set_label("start");
+    buttons[STEP].set_sensitive(true);
+}
+
 bool My_window::loop()
 {
-    if (loop_activated)
-    {
-        game.update();
-        update_infos();
-        drawing.queue_draw();
-        return true;
+    if (!loop_activated) return false;
+
+    if (game.is_finished()) {
+        stop_loop();
+        return false;
     }
-    return false;
+
+    game.update();
+    update_infos();
+    drawing.queue_draw();
+
+    if (game.is_finished()) {
+        stop_loop();
+        return false;
+    }
+
+    return true;
 }
 
 void My_window::set_infos()

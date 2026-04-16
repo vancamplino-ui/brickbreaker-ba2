@@ -171,6 +171,21 @@ void Game::update()
 {
 }
 
+bool Game::is_finished() const
+{
+    return is_won() || is_lost();
+}
+
+bool Game::is_won() const
+{
+    return bricks.empty();
+}
+
+bool Game::is_lost() const
+{
+    return balls.empty() && lives == 0;
+}
+
 void Game::reset()
 {
     score = 0;

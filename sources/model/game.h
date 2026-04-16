@@ -24,6 +24,9 @@ public:
     bool load(std::string const& filename);
     void save(std::string const& filename) const;
     void update();
+    bool is_finished() const;
+    bool is_won() const;
+    bool is_lost() const;
     void reset();
     int get_score() const;
     int get_lives() const;
