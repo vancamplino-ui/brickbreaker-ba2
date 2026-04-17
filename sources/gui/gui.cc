@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "constants.h"
+#include "graphic.h"
 #include "graphic_gui.h"
 #include "gui.h"
 
@@ -335,7 +336,34 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     double side(std::min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
-    // TODO: draw the game
+    draw_background();
+    draw_arena_border();
+
+    for (Brick const* brick : game.get_bricks())
+    {
+        if (brick == nullptr) continue;
+
+        switch (brick->getType())
+        {
+        case RAINBOW:
+            draw_rainbow_brick(brick->getBody(),
+                               static_cast<RainbowBrick const*>(brick)->getHitPoints());
+            break;
+
+        case BALL:
+            draw_ball_brick(brick->getBody());
+            break;
+
+        case SPLIT:
+            draw_split_brick(brick->getBody());
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    draw_paddle(game.get_paddle().getArc());
 }
 
 void My_window::set_mouse_controller()
