@@ -77,7 +77,7 @@ void draw_arena_border()
 {
     set_color(GREY);
     (*ptcr)->set_line_width(1.0);
-    (*ptcr)->rectangle(0.0, 0.0, arena_size, arena_size);
+    (*ptcr)->rectangle(-0.5, -0.5, arena_size + 1, arena_size + 1);
     (*ptcr)->stroke();
 }
 

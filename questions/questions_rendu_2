@@ -1,0 +1,14 @@
+1 : save : est ce que un save doit passer et ajouter automatiquement le .txt si 
+    il n'est pas implicitmenent mit dans le nom? --> ajouter automatiquement le .txt 
+
+2 : restart : est ce qu'on doit pouvoir régénérer le dernier bon fichier ouvert 
+    après avoir fait un open d'un dossier contenant une erreur ? tout bon !
+
+3 : boucle loop : a la fin du jeu comment la gérer pour l'arrêter automatiquement 
+    pas qu'elle tourne dans le vide car on appuie pas sur stop a la fin du jeu 
+    j'ai fait un truc mais je suis pas sur du tout cf gui... -->  egale avant ou après  
+
+4 : superposition afficheage brick et bordures map --> example fichier 14 --> mettre outsight la bordure  
+
+5 : quand un open passe pas il faut afficher une fenêtre blanche mais il faut 
+    laisser le fond blanc et la bordure ou pas du cadre ? --> inclure le cadre pour enlever quand un open fail 
