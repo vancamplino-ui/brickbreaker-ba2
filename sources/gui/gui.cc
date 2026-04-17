@@ -363,6 +363,11 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
         }
     }
 
+    for (Ball const& ball : game.get_balls())
+    {
+        draw_ball(ball.getBody());
+    }
+
     draw_paddle(game.get_paddle().getArc());
 }
 

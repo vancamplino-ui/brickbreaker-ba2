@@ -125,17 +125,18 @@ void draw_split_brick(Square const& square, unsigned level)
 
 void draw_ball(Circle const& circle)
 {
-    (void)circle;
-    // TODO
+    set_color(BLACK);
+    fill_circle(circle);
 }
 
 void draw_paddle(Circle const& arc)
 {
     if (arc.radius <= 0.0) return;
-
+    
+    //0 = y + r sin(t)
+    //sin(t) = -y / r
     const double ratio(-arc.center.y / arc.radius);
-    const double clamped_ratio(std::max(0.0, std::min(1.0, ratio)));
-    const double start_angle(std::asin(clamped_ratio));
+    const double start_angle(std::asin(ratio));
     const double end_angle(3.14159265358979323846 - start_angle);
 
     set_color(BLACK);
