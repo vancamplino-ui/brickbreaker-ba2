@@ -16,33 +16,38 @@ Circle Paddle::getArc() const
     return arc;
 }
 
-bool Paddle::is_y_valid() const
+bool Paddle::is_y_valid(double eps) const
 {
-    return arc.center.y <= 0;
+    return arc.center.y <= eps;
 }
 
-bool Paddle::is_visible() const
+bool Paddle::is_visible(double eps) const
 {
-    return arc.center.y + arc.radius > 0;
+    return arc.center.y + arc.radius > eps;
 }
 
-bool Paddle::valid_extremities() const
+bool Paddle::valid_extremities(double eps) const
 {
     double left(arc.center.x - arc.radius);
     double right(arc.center.x + arc.radius);
 
-    return left >= 0 && right <= arena_size;
+    return left >= -eps && right <= arena_size + eps;
 }
 
-bool Paddle::is_x_valid() const
+bool Paddle::is_x_valid(double eps) const
 {
-    return valid_extremities();
+    return valid_extremities(eps);
 }
 
-bool Paddle::is_valid() const
+bool Paddle::is_valid(double eps) const
 {
-    if (!is_y_valid()) return false;
-    if (!is_visible()) return false;
-    if (!is_x_valid()) return false;
+    if (!is_y_valid(eps)) return false;
+    if (!is_visible(eps)) return false;
+    if (!is_x_valid(eps)) return false;
     return true;
+}
+
+void Paddle::move_to(double x)
+{
+    arc.center.x = x;
 }

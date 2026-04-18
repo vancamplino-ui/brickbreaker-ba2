@@ -4,6 +4,7 @@
 // Version  : 1.0 du 27.03.2026
 //
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -73,11 +74,16 @@ bool Game::bricks_intersect()
     return false;
 }
 
-bool Game::paddle_intersects_brick()
+bool Game::paddle_intersects_brick(Paddle const* tested_paddle) const
 {
+    Paddle const* paddle_to_test = &paddle;
+    if (tested_paddle != nullptr) paddle_to_test = tested_paddle;
+
     for (size_t i = 0; i < bricks.size(); ++i) {
-        if (::intersects(paddle.getArc(), bricks[i]->getBody())) {
-            std::cout << message::collision_paddle_brick(i);
+        if (::intersects(paddle_to_test->getArc(), bricks[i]->getBody())) {
+            if (tested_paddle == nullptr) {
+                std::cout << message::collision_paddle_brick(i);
+            }
             return true;
         }
     }
@@ -220,6 +226,24 @@ std::vector<Brick*> const& Game::get_bricks() const
     return bricks;
 }
 
+void Game::move_paddle_to(double x)
+{
+    double current_x = paddle.getArc().center.x;
+    double dx = x - current_x;
+    double new_x = x;
+
+    if (std::abs(dx) > delta_norm_max) {
+        new_x = current_x + ((dx > 0) ? delta_norm_max : -delta_norm_max);
+    }
+
+    Paddle candidate(paddle);
+    candidate.move_to(new_x);
+
+    if (!candidate.is_valid(epsil_zero)) return;
+    if (paddle_intersects_brick(&candidate)) return;
+
+    paddle = candidate;
+}
 namespace
 {
     bool read_next_token(std::ifstream& file, std::string& token)

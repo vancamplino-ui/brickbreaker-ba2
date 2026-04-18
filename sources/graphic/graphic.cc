@@ -1,6 +1,7 @@
 #include "graphic.h"
 #include "graphic_gui.h"
 #include "../tools/constants.h"
+#include "../tools/tools.h"
 
 #include <cmath>
 

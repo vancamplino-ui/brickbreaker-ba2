@@ -20,9 +20,9 @@ public:
     Point getDelta() const;
  
     // contrôle des données fournies en entrée 
-    bool is_inside_arena() const;
-    bool is_delta_valid() const;
-    bool is_valid() const;
+    bool is_inside_arena(double eps = 0) const;
+    bool is_delta_valid(double eps = 0) const;
+    bool is_valid(double eps = 0) const;
  
 private:
     Circle body;  // on représente la balle par un cercle (centre + rayon)

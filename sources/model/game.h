@@ -33,6 +33,7 @@ public:
     Paddle const& get_paddle() const;
     std::vector<Ball> const& get_balls() const;
     std::vector<Brick*> const& get_bricks() const;
+    void move_paddle_to(double x);
 
 private:
     // métodes privées de game
@@ -40,7 +41,7 @@ private:
     void clear_bricks();
     // detection des intersections initiales entre les entites
     bool bricks_intersect();
-    bool paddle_intersects_brick();
+    bool paddle_intersects_brick(Paddle const* tested_paddle = nullptr) const;
     bool balls_intersect();
     bool ball_intersects_brick();
     bool paddle_intersects_ball();

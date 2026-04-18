@@ -18,11 +18,12 @@ public:
     Circle getArc() const;
 
     // contrôle des données fournies en entrée 
-    bool is_y_valid() const;
-    bool is_x_valid() const;
-    bool is_visible() const;
-    bool valid_extremities() const;
-    bool is_valid() const;  
+    bool is_y_valid(double eps = 0) const;
+    bool is_x_valid(double eps = 0) const;
+    bool is_visible(double eps = 0) const;
+    bool valid_extremities(double eps = 0) const;
+    bool is_valid(double eps = 0) const;
+    void move_to(double x); 
 
 private:
     Circle arc; // on représente l'arc de la raquette visible par un cercle entier

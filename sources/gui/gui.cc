@@ -391,5 +391,12 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 }
 void My_window::on_drawing_move(double x, double y)
 {
-    cout << __func__ << endl; // TODO
+    cout << __func__ << endl; 
+    double width = drawing.get_width();
+    double height = drawing.get_height();
+    double side = min(width, height);
+    double arena_x = (x - (width - side) / 2.0) * arena_size / side;
+
+    game.move_paddle_to(arena_x);
+    drawing.queue_draw();
 }
