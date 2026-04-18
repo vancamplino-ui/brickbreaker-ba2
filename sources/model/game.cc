@@ -175,6 +175,7 @@ void Game::save(std::string const& filename) const
 
 void Game::update()
 {
+    move_paddle_to(paddle.get_target_mouse());
 }
 
 bool Game::is_finished() const
@@ -224,6 +225,11 @@ std::vector<Ball> const& Game::get_balls() const
 std::vector<Brick*> const& Game::get_bricks() const
 {
     return bricks;
+}
+
+void Game::set_paddle_target(double x)
+{
+    paddle.set_target_mouse(x);
 }
 
 void Game::move_paddle_to(double x)

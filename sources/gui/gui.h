@@ -26,33 +26,31 @@ private:
     std::string current_file_name;
 
     void set_commands();
-
     void exit_clicked();
     void open_clicked();
     void save_clicked();
     void restart_clicked();
     void start_clicked();
     void step_clicked();
-
     void set_key_controller();
-    bool key_pressed(guint keyval, guint keycode, Gdk::ModifierType state);
 
+    bool key_pressed(guint keyval, guint keycode, Gdk::ModifierType state);
     void set_dialog(Gtk::FileChooserDialog *dialog);
+
     void dialog_response(int response, Gtk::FileChooserDialog *dialog);
     void handle_open_file(std::filesystem::path const& file_name,
                           Gtk::FileChooserDialog *dialog);
     void handle_save_file(std::filesystem::path const& file_name,
                           Gtk::FileChooserDialog *dialog);
-    void stop_loop();
 
+    void stop_loop();
     bool loop();
 
     void set_infos();
     void update_infos();
-
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
-
+    
     void set_mouse_controller();
     void on_drawing_left_click(int n_press, double x, double y);
     void on_drawing_move(double x, double y);

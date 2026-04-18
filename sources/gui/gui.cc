@@ -397,6 +397,7 @@ void My_window::on_drawing_move(double x, double y)
     double side = min(width, height);
     double arena_x = (x - (width - side) / 2.0) * arena_size / side;
 
-    game.move_paddle_to(arena_x);
+    game.set_paddle_target(arena_x);
     drawing.queue_draw();
+    cout << __func__ << ": " << arena_x << endl; 
 }

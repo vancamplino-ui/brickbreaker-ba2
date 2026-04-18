@@ -33,6 +33,7 @@ public:
     Paddle const& get_paddle() const;
     std::vector<Ball> const& get_balls() const;
     std::vector<Brick*> const& get_bricks() const;
+    void set_paddle_target(double x);
     void move_paddle_to(double x);
 
 private:

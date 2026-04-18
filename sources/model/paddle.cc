@@ -6,14 +6,26 @@
 
 #include "paddle.h"
 
+#include <cmath>
+
 Paddle::Paddle(Point center, double radius)
-    : arc{center, radius}
+    : arc{center, radius}, target_mouse(center.x)
 {
 }
 
 Circle Paddle::getArc() const
 {
     return arc;
+}
+
+double Paddle::get_target_mouse() const
+{
+    return target_mouse;
+}
+
+void Paddle::set_target_mouse(double x)
+{
+    target_mouse = x;
 }
 
 bool Paddle::is_y_valid(double eps) const
@@ -26,18 +38,28 @@ bool Paddle::is_visible(double eps) const
     return arc.center.y + arc.radius > eps;
 }
 
-bool Paddle::valid_extremities(double eps) const
+double Paddle::visible_half_width(double eps) const
 {
-    double left(arc.center.x - arc.radius);
-    double right(arc.center.x + arc.radius);
+    if (arc.center.y >= eps) return arc.radius;
 
-    return left >= -eps && right <= arena_size + eps;
+    double dy(eps - arc.center.y);
+    double radius_sq(arc.radius * arc.radius);
+    double width_sq(radius_sq - dy * dy);
+
+    if (width_sq <= 0.0) return 0.0;
+
+    return std::sqrt(width_sq);
 }
 
 bool Paddle::is_x_valid(double eps) const
 {
-    return valid_extremities(eps);
+    double half_width(visible_half_width(eps));
+    double left(arc.center.x - half_width);
+    double right(arc.center.x + half_width);
+
+    return left >= -eps && right <= arena_size + eps;
 }
+
 
 bool Paddle::is_valid(double eps) const
 {
