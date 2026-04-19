@@ -385,10 +385,16 @@ void My_window::set_mouse_controller()
     drawing.add_controller(left_click);
     drawing.add_controller(move);
 }
+
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
-    cout << __func__ << endl; // TODO
+    if (game.get_balls().empty() && game.get_lives() > 0) {
+        game.add_ball_on_paddle();
+        update_infos();
+        drawing.queue_draw();
+    }
 }
+
 void My_window::on_drawing_move(double x, double y)
 {
     cout << __func__ << endl; 

@@ -34,6 +34,7 @@ public:
     std::vector<Ball> const& get_balls() const;
     std::vector<Brick*> const& get_bricks() const;
     void set_paddle_target(double x);
+    void add_ball_on_paddle();
     void move_paddle_to(double x);
 
 private:

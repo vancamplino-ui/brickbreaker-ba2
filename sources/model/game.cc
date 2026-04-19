@@ -250,6 +250,16 @@ void Game::move_paddle_to(double x)
 
     paddle = candidate;
 }
+
+void Game::add_ball_on_paddle()
+{
+    double top_x = paddle.getArc().center.x;
+    double top_y = paddle.getArc().center.y + paddle.getArc().radius;
+    balls.push_back(Ball({{top_x, top_y + epsil_zero}, new_ball_radius},
+                         {0.0, new_ball_delta_norm}));
+    --lives;
+}
+
 namespace
 {
     bool read_next_token(std::ifstream& file, std::string& token)
