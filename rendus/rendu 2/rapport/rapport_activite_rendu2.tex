@@ -1,0 +1,98 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[top=2.1cm, bottom=1.8cm, left=1.8cm, right=1.8cm]{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.35em}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Victor Henri Willy Eder\\Liam Van Camp}
+\rhead{26 avril 2026\\EPFL Microtechnique}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{28pt}
+\setlength{\headsep}{18pt}
+
+\begin{document}
+\begin{center}
+    {\huge \textbf{Rapport d’activité -- Rendu 2}}
+\end{center}
+\vspace{0.5cm}
+
+{\large \textbf{Part I : Méthode de travail}}
+
+\begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+\item
+Nous avons conservé la même méthode de travail que lors du Rendu 1. Celle-ci repose sur une phase initiale de planification commune, suivie d’un développement autonome des différentes parties du projet, puis d’une intégration finale réalisée ensemble.
+
+Nous avons commencé par prendre en main les fichiers GTKmm fournis par l’EPFL, afin de comprendre l’architecture du projet, avant de répartir les tâches entre les membres du groupe.
+\end{list}
+
+{\large \textbf{Part II : Répartition du travail}}
+
+\begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+\item
+    {\normalsize \textbf{Liam Van Camp}}
+
+    \begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+    \item
+    Mise à jour de la classe \texttt{Paddle} (\texttt{target\_mouse}, \texttt{move\_to}, \texttt{is\_valid} avec \texttt{eps}), mise à jour du module \texttt{game} (\texttt{save}, \texttt{reset}, \texttt{update}, getters, \texttt{move\_paddle\_to}), ainsi que la structure de base du module \texttt{gui} (boutons, boucle de jeu).
+    \end{list}
+
+    {\normalsize \textbf{Victor Henri Willy Eder}}
+
+    \begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+    \item
+    Implémentation des raccourcis clavier dans le module \texttt{gui} (touches \texttt{s}, \texttt{1}, \texttt{r} reliées aux boutons \texttt{start}, \texttt{step}, \texttt{restart}), mise à jour des classes \texttt{Ball} et \texttt{Brick} (surcharge de \texttt{is\_valid} avec \texttt{eps}), complétion du module \texttt{gui} (interactions souris), tests et validation de l’interface graphique.
+    \end{list}
+
+    {\normalsize \textbf{Travail effectué ensemble}}
+
+    \begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+    \item
+    Développement du module \texttt{graphic} (dessin Cairo des briques, balles, raquette et arène), intégration finale, mise en place du Makefile GTKmm, corrections et validation sur les fichiers de test.
+    \end{list}
+\end{list}
+
+{\large \textbf{Part III : Hiérarchie des classes Brick}}
+
+\begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+\item
+La superclasse \texttt{Brick} contient les attributs \texttt{body} (de type \texttt{Square}) et \texttt{type} (de type \texttt{BrickType}), ainsi que les méthodes \texttt{is\_valid()}, \texttt{is\_inside\_arena()} et \texttt{is\_size\_valid()}.La méthode \texttt{is\_valid()} est déclarée \texttt{virtual} afin de permettre un comportement adapté dans les classes dérivées, en appelant la version correspondant à l’objet réel (polymorphisme). Le destructeur est également \texttt{virtual} afin d’assurer une libération correcte de la mémoire lors de l’utilisation de pointeurs de type \texttt{Brick*}.
+
+La classe \texttt{RainbowBrick} ajoute l’attribut \texttt{hit\_points} et redéfinit (\texttt{override}) la méthode \texttt{is\_valid()} afin d’y inclure la vérification \texttt{is\_hit\_points\_valid()}.
+
+Les classes \texttt{BallBrick} et \texttt{SplitBrick} n’ajoutent actuellement ni attributs ni méthodes spécifiques, mais permettent d’étendre leur comportement ultérieurement.
+\end{list}
+
+{\large \textbf{Part IV : Structure des données de Game}}
+
+\begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+\item
+La classe \texttt{Game} regroupe l’état global de la partie et coordonne les autres entités. Ses attributs principaux sont \texttt{score} et \texttt{lives}, qui mémorisent l’état du joueur, ainsi qu’un objet \texttt{Paddle} \texttt{paddle}, un ensemble de balles \texttt{std::vector<Ball>} \texttt{balls} et un ensemble de briques \texttt{std::vector<Brick*>} \texttt{bricks}.
+
+Les différentes entités du jeu sont donc mémorisées dans des conteneurs dynamiques au sein de \texttt{Game}. La raquette est stockée comme un objet unique, car il n’existe qu’une seule instance en jeu. Les balles sont stockées par valeur dans un vecteur homogène, tandis que les briques sont stockées sous forme de pointeurs vers la classe de base \texttt{Brick}, afin de permettre le polymorphisme entre les différentes classes dérivées.
+
+
+Les dépendances entre modules sont les suivantes :
+\[
+\texttt{tools} \leftarrow \texttt{brick/ball/paddle} \leftarrow \texttt{game} \leftarrow \texttt{gui} \leftarrow \texttt{project}
+\]
+\[
+\texttt{tools} \leftarrow \texttt{graphic} \leftarrow \texttt{gui}
+\]
+\end{list}
+{\large \textbf{Part V : Module tools}}
+
+\begin{list}{}{\leftmargin=0.5cm \rightmargin=0cm}
+\item
+Le module \texttt{tools} définit les structures géométriques de base : \texttt{Point} (vecteur 2D), \texttt{Circle} (centre et rayon) et \texttt{Square} (centre et demi-longueur de côté).
+
+Il fournit également des fonctions utilitaires telles que \texttt{norm()}, \texttt{distance()}, \texttt{normalized()}, \texttt{contains()} et \texttt{intersects()} (pour les combinaisons \texttt{Circle/Circle}, \texttt{Square/Square} et \texttt{Circle/Square}).
+
+Ce module est indépendant de toute logique de jeu.
+\end{list}
+
+\end{document}

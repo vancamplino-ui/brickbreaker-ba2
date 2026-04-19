@@ -30,6 +30,7 @@ constexpr unsigned drawing_size(500);
 My_window::My_window(string file_name)
     : main_box(Gtk::Orientation::HORIZONTAL), panel_box(Gtk::Orientation::VERTICAL),
       command_box(Gtk::Orientation::VERTICAL), loop_activated(false),
+      arena_visible(false),
       buttons({Gtk::Button("exit"), Gtk::Button("open"), Gtk::Button("save"),
                Gtk::Button("restart"), Gtk::Button("start"), Gtk::Button("step")}),
       info_frame("Infos :"), info_text({Gtk::Label("score:"), Gtk::Label("lives:"),
@@ -51,8 +52,11 @@ My_window::My_window(string file_name)
 
     if (!current_file_name.empty()) {
         game.reset();
-        if (!game.load(current_file_name)) {
+        if (game.load(current_file_name)) {
+            arena_visible = true;
+        } else {
             game.reset();
+            arena_visible = false;
         }
     }
 
@@ -104,8 +108,11 @@ void My_window::restart_clicked()
       if (current_file_name.empty()) return;
 
     game.reset();
-    if (!game.load(current_file_name)) {
+    if (game.load(current_file_name)) {
+        arena_visible = true;
+    } else {
         game.reset();
+        arena_visible = false;
     }
 
     update_infos();
@@ -221,8 +228,10 @@ void My_window::handle_open_file(std::filesystem::path const& file_name,
     game.reset();
     if (game.load(file_name.string())) {
         current_file_name = file_name.string();
+        arena_visible = true;
     } else {
         game.reset();
+        arena_visible = false;
     }
 
     update_infos();
@@ -333,6 +342,13 @@ void My_window::set_drawing()
 void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     graphic_set_context(cr);
+    cr->save();
+    cr->set_source_rgb(1.0, 1.0, 1.0);
+    cr->paint();
+    cr->restore();
+
+    if (!arena_visible) return;
+
     double side(std::min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
@@ -398,12 +414,15 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 void My_window::on_drawing_move(double x, double y)
 {
     cout << __func__ << endl; 
+    //convertion des coordonnées de la fenêtre aux coordonnées de l'arène
     double width = drawing.get_width();
     double height = drawing.get_height();
     double side = min(width, height);
+    
+    //prise en compte uniquement de la partie drawing et consacré a l'arrène 
     double arena_x = (x - (width - side) / 2.0) * arena_size / side;
 
     game.set_paddle_target(arena_x);
     drawing.queue_draw();
-    cout << __func__ << ": " << arena_x << endl; 
+    
 }

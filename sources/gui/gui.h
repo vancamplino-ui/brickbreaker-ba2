@@ -17,6 +17,7 @@ private:
     Gtk::Box main_box, panel_box, command_box;
     Gtk::Grid info_grid;
     bool loop_activated;
+    bool arena_visible;
     sigc::connection loop_conn;
     std::array<Gtk::Button, 6> buttons;
     Gtk::Frame info_frame;
