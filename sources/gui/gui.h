@@ -1,3 +1,8 @@
+// gui.h : déclaration de la classe My_window
+//
+// Auteurs : Liam Van Camp, Victor Henri Willy Eder
+// Version : 1.0 du 26.04.2026
+
 #ifndef GUI_H
 #define GUI_H
 
@@ -51,7 +56,7 @@ private:
     void update_infos();
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
-    
+
     void set_mouse_controller();
     void on_drawing_left_click(int n_press, double x, double y);
     void on_drawing_move(double x, double y);

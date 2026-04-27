@@ -1,19 +1,25 @@
+// graphic.cc : dessin des entités du jeu via Cairo
+//
+// Auteurs : Liam Van Camp, Victor Henri Willy Eder
+// Version : 1.0 du 26.04.2026
+
+#include <cmath>
+
 #include "graphic.h"
 #include "graphic_gui.h"
 #include "../tools/constants.h"
 #include "../tools/tools.h"
 
-#include <cmath>
-
 static const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
 namespace
 {
-constexpr double two_pi = 6.28318530717958647692;
-Color rainbow_color_from_hit_points(int hit_points);
-void fill_square(Square const& square);
-void fill_circle(Circle const& circle);
-double split_child_half_size(double parent_half_size);
+    constexpr double two_pi = 6.28318530717958647692;
+    constexpr double pi = 3.14159265358979323846;
+    Color rainbow_color_from_hit_points(int hit_points);
+    void fill_square(Square const& square);
+    void fill_circle(Circle const& circle);
+    double split_child_half_size(double parent_half_size);
 }
 
 void graphic_set_context(const Cairo::RefPtr<Cairo::Context> &cr)
@@ -133,12 +139,12 @@ void draw_ball(Circle const& circle)
 void draw_paddle(Circle const& arc)
 {
     if (arc.radius <= 0.0) return;
-    
+
     //0 = y + r sin(t)
     //sin(t) = -y / r
     const double ratio(-arc.center.y / arc.radius);
     const double start_angle(std::asin(ratio));
-    const double end_angle(3.14159265358979323846 - start_angle);
+    const double end_angle(pi - start_angle);
 
     set_color(BLACK);
     (*ptcr)->set_line_width(1.0);
@@ -152,37 +158,37 @@ void draw_paddle(Circle const& arc)
 
 namespace
 {
-Color rainbow_color_from_hit_points(int hit_points)
-{
-    static const Color colors[] = {RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE};
+    Color rainbow_color_from_hit_points(int hit_points)
+    {
+        static const Color colors[] = {RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE};
 
-    if (hit_points <= 1) return colors[0];
-    if (hit_points >= 7) return colors[6];
-    return colors[hit_points - 1];
-}
+        if (hit_points <= 1) return colors[0];
+        if (hit_points >= 7) return colors[6];
+        return colors[hit_points - 1];
+    }
 
-void fill_square(Square const& square)
-{
-    const double side(2.0 * square.half_size);
-    (*ptcr)->rectangle(square.center.x - square.half_size,
-                       square.center.y - square.half_size,
-                       side,
-                       side);
-    (*ptcr)->fill();
-}
+    void fill_square(Square const& square)
+    {
+        const double side(2.0 * square.half_size);
+        (*ptcr)->rectangle(square.center.x - square.half_size,
+                           square.center.y - square.half_size,
+                           side,
+                           side);
+        (*ptcr)->fill();
+    }
 
-void fill_circle(Circle const& circle)
-{
-    (*ptcr)->arc(circle.center.x,
-                 circle.center.y,
-                 circle.radius,
-                 0.0,
-                 two_pi);
-    (*ptcr)->fill();
-}
+    void fill_circle(Circle const& circle)
+    {
+        (*ptcr)->arc(circle.center.x,
+                     circle.center.y,
+                     circle.radius,
+                     0.0,
+                     two_pi);
+        (*ptcr)->fill();
+    }
 
-double split_child_half_size(double parent_half_size)
-{
-    return (2.0 * parent_half_size - split_brick_gap) / 4.0;
-}
+    double split_child_half_size(double parent_half_size)
+    {
+        return (2.0 * parent_half_size - split_brick_gap) / 4.0;
+    }
 }

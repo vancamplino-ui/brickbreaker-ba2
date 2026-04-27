@@ -1,3 +1,8 @@
+// gui.cc : gestion de l'interface graphique GTKmm
+//
+// Auteurs : Liam Van Camp, Victor Henri Willy Eder
+// Version : 1.0 du 26.04.2026
+
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
@@ -104,8 +109,7 @@ void My_window::save_clicked()
 }
 void My_window::restart_clicked()
 {
-    cout << __func__ << endl; 
-      if (current_file_name.empty()) return;
+    if (current_file_name.empty()) return;
 
     game.reset();
     if (game.load(current_file_name)) {
@@ -120,7 +124,6 @@ void My_window::restart_clicked()
 }
 void My_window::start_clicked()
 {
-    cout << __func__ << endl;
     if (loop_activated)
     {
         loop_conn.disconnect();
@@ -154,7 +157,6 @@ void My_window::start_clicked()
 }
 void My_window::step_clicked()
 {
-    cout << __func__ << endl; 
     game.update();
     update_infos();
     drawing.queue_draw();
@@ -189,7 +191,7 @@ void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 {
     dialog->set_modal(true); // block the main window until the dialog is closed
     dialog->set_transient_for(*this);
-    dialog->set_select_multiple(false);//interdit la séléction multiple de fichiers 
+    dialog->set_select_multiple(false); // interdit la séléction multiple de fichiers
     dialog->signal_response().connect(
         sigc::bind(sigc::mem_fun(*this, &My_window::dialog_response), dialog));
 
@@ -363,7 +365,7 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
         {
         case RAINBOW:
             draw_rainbow_brick(brick->getBody(),
-                               static_cast<RainbowBrick const*>(brick)->getHitPoints());
+                              static_cast<RainbowBrick const*>(brick)->getHitPoints());
             break;
 
         case BALL:
@@ -413,16 +415,15 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    cout << __func__ << endl; 
     //convertion des coordonnées de la fenêtre aux coordonnées de l'arène
     double width = drawing.get_width();
     double height = drawing.get_height();
     double side = min(width, height);
-    
-    //prise en compte uniquement de la partie drawing et consacré a l'arrène 
+
+    //prise en compte uniquement de la partie drawing et consacré a l'arrène
     double arena_x = (x - (width - side) / 2.0) * arena_size / side;
 
     game.set_paddle_target(arena_x);
     drawing.queue_draw();
-    
+
 }
