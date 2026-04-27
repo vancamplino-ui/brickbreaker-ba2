@@ -1,12 +1,11 @@
 // paddle.cc  : definition des methodes de la classe Paddle
 //
-// Auteur     : Liam Van Camp
-// Version    : 1.0 du 27.03.2026
-//
-
-#include "paddle.h"
+// Auteur   : Liam Van Camp
+// Version  : 1.0 du 26.04.2026
 
 #include <cmath>
+
+#include "paddle.h"
 
 Paddle::Paddle(Point center, double radius)
     : arc{center, radius}, target_mouse(center.x)
@@ -59,7 +58,6 @@ bool Paddle::is_x_valid(double eps) const
 
     return left >= -eps && right <= arena_size + eps;
 }
-
 
 bool Paddle::is_valid(double eps) const
 {

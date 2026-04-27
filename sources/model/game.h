@@ -1,8 +1,7 @@
 // game.h  : declaration de la classe Game
 //
-// Auteurs   : Liam Van Camp, Victor Henri Willy Eder
-// Version   : 1.0 du 27.03.2026
-//
+// Auteurs  : Liam Van Camp, Victor Henri Willy Eder
+// Version  : 1.0 du 26.04.2026
 
 #ifndef GAME_H
 #define GAME_H
@@ -38,7 +37,7 @@ public:
     void move_paddle_to(double x);
 
 private:
-    // métodes privées de game
+    // méthodes privées de game
     // libere les briques actuellement stockees dans Game.
     void clear_bricks();
     // detection des intersections initiales entre les entites
@@ -47,7 +46,7 @@ private:
     bool balls_intersect();
     bool ball_intersects_brick();
     bool paddle_intersects_ball();
-   
+
     // déclaration des attributs
     int score;
     int lives;

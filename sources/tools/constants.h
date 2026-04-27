@@ -1,8 +1,7 @@
 // constants.h  : constantes globales du projet
 //
 // Auteur       : copie de la verstion transmise par le professeur
-// Version      : 1.0 du 27.03.2026
-//
+// Version  : 1.0 du 26.04.2026
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -15,7 +14,7 @@ constexpr double new_ball_delta_norm = 0.8;
 constexpr double delta_norm_max = 3.;
 constexpr double split_brick_gap = 3.;
 constexpr double brick_size_min = 3.;
-constexpr unsigned nb_bounce_max = 5; 
+constexpr unsigned nb_bounce_max = 5;
 constexpr unsigned score_per_hit = 10;
 constexpr unsigned score_per_life = 300;
 constexpr unsigned dt = 25; // time interval between each step in milliseconds

@@ -1,15 +1,14 @@
 // tools.h  : structures geometriques et fonctions utilitaires
 //
 // Auteur   : Liam Van Camp
-// Version  : 1.0 du 27.03.2026
-//
+// Version  : 1.0 du 26.04.2026
 
 #ifndef TOOLS_H
 #define TOOLS_H
 
 constexpr double epsil_zero = 0.125;
 
-// définition d'un point (coordonées x et y), 
+// définition d'un point (coordonées x et y),
 // mais aussi d'un vecteur (x = déplacement horizontal, y = déplacement vertical)
 
 struct Point
@@ -58,7 +57,6 @@ double distance(Point a, Point b);
 // normalisation d'un vecteur
 Point normalized(Point p);
 
-
 // inclusion et intersection
 bool is_inside(Circle c, Point p, double eps = 0.0);
 bool is_inside(Square s, Point p, double eps = 0.0);
@@ -66,4 +64,5 @@ bool is_inside(Square s, Point p, double eps = 0.0);
 bool intersects(Circle c1, Circle c2, double eps = 0.0);
 bool intersects(Square s1, Square s2, double eps = 0.0);
 bool intersects(Circle c, Square s, double eps = 0.0);
+
 #endif

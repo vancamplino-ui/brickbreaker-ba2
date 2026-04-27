@@ -1,8 +1,7 @@
 // paddle.h  : declaration de la classe Paddle
 //
-// Auteur    : Liam Van Camp
-// Version   : 1.0 du 27.03.2026
-//
+// Auteur   : Liam Van Camp
+// Version  : 1.0 du 26.04.2026
 
 #ifndef PADDLE_H
 #define PADDLE_H
@@ -13,19 +12,18 @@
 class Paddle
 {
 public:
-    // constructeur de la raquette. 
-    Paddle(Point center = {0.0, 0.0}, double radius = 0.0); 
+    // constructeur de la raquette.
+    Paddle(Point center = {0.0, 0.0}, double radius = 0.0);
     Circle getArc() const;
     double get_target_mouse() const;
     void set_target_mouse(double x);
 
-    // contrôle des données fournies en entrée 
+    // contrôle des données fournies en entrée
     bool is_y_valid(double eps = 0) const;
     bool is_x_valid(double eps = 0) const;
-    bool is_visible(double eps = 0) const;
-    bool valid_extremities(double eps = 0) const;
+    bool is_visible(double eps = 0) const;    
     bool is_valid(double eps = 0) const;
-    void move_to(double x); 
+    void move_to(double x);
 
 private:
     double visible_half_width(double eps = 0) const;

@@ -1,16 +1,15 @@
 // tools.cc  : definition des fonctions utilitaires geometriques
 //
 // Auteur    : Liam Van Camp
-// Version   : 1.0 du 27.03.2026
-//
+// Version  : 1.0 du 26.04.2026
 
 #include <algorithm>
 #include <cmath>
 
 #include "tools.h"
 
-// Définition des fonctions liées aux différentes opérations sur des points 
-// et de vecteurs. 
+// Définition des fonctions liées aux différentes opérations sur des points
+// et de vecteurs.
 
 Point operator+(Point a, Point b) { return {a.x + b.x, a.y + b.y}; }
 Point operator-(Point a, Point b) { return {a.x - b.x, a.y - b.y}; }

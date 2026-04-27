@@ -1,8 +1,7 @@
 // game.cc  : lecture du fichier de jeu et validations initiales
 //
 // Auteurs  : Liam Van Camp, Victor Henri Willy Eder
-// Version  : 1.0 du 27.03.2026
-//
+// Version  : 1.0 du 26.04.2026
 
 #include <cmath>
 #include <fstream>
@@ -19,7 +18,7 @@ namespace
 {
     // Les fonctions de lecture restent locales a game.cc pour ne pas surcharger
     // la classe Game avec de nombreuses methodes qui ne servent qu'a load().
-    
+
     bool read_next_token(std::ifstream& file, std::string& token);
     bool read_int(std::ifstream& file, int& value);
     bool read_double(std::ifstream& file, double& value);
@@ -54,7 +53,6 @@ Game::~Game()
 {
     clear_bricks();
 }
-
 
 void Game::clear_bricks()
 {
@@ -255,7 +253,8 @@ void Game::add_ball_on_paddle()
 {
     double top_x = paddle.getArc().center.x;
     double top_y = paddle.getArc().center.y + paddle.getArc().radius;
-    balls.push_back(Ball({{top_x, top_y + new_ball_radius + epsil_zero}, new_ball_radius},
+    balls.push_back(Ball({{top_x, top_y + new_ball_radius + epsil_zero},
+                           new_ball_radius},
                          {0.0, new_ball_delta_norm}));
     --lives;
 }
