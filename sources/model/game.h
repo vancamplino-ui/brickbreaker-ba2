@@ -19,6 +19,10 @@ class Game
 public:
     Game();
     ~Game();
+    Game(Game const&) = delete;
+    Game& operator=(Game const&) = delete;
+    Game(Game&&) = delete;
+    Game& operator=(Game&&) = delete;
 
     bool load(std::string const& filename);
     void save(std::string const& filename) const;
