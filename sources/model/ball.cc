@@ -22,7 +22,7 @@ Point Ball::getDelta() const
 
 // vérifie que la balle est bien dans l'arène
 // le bord inférieur ignore le rayon (on teste juste le centre pour y=0)
-// note : pas d'epsil_zero ici car c'est utilisé lors de la lecture de fichier
+// eps = 0 pour la lecture de fichier, epsil_zero pendant le jeu
 bool Ball::is_inside_arena(double eps) const
 {
     double xmin(body.center.x - body.radius);
@@ -37,7 +37,7 @@ bool Ball::is_inside_arena(double eps) const
 }
 
 // vérifie que la norme du vecteur delta est <= delta_norm_max
-// note : pas d'epsil_zero ici car c'est utilisé lors de la lecture de fichier
+// eps = 0 pour la lecture de fichier, epsil_zero pendant le jeu
 bool Ball::is_delta_valid(double eps) const
 {
     return norm(delta) <= delta_norm_max + eps;
@@ -48,4 +48,14 @@ bool Ball::is_valid(double eps) const
     if (!is_inside_arena(eps)) return false;
     if (!is_delta_valid(eps)) return false;
     return true;
+}
+
+void Ball::translate(Point d)
+{
+    body.center = body.center + d;
+}
+
+void Ball::setDelta(Point new_delta)
+{
+    delta = new_delta;
 }

@@ -18,6 +18,9 @@ public:
     Circle getBody() const;
     Point getDelta() const;
 
+    void translate(Point d);
+    void setDelta(Point new_delta);
+
     // contrôle des données fournies en entrée
     bool is_inside_arena(double eps = 0) const;
     bool is_delta_valid(double eps = 0) const;
