@@ -101,7 +101,7 @@ bool SplitBrick::hit(std::vector<Brick*>& new_bricks)
 
     if (new_half * 2 < brick_size_min) return true;
 
-    double offset = body.half_size / 2.0 + new_half / 2.0;
+    double offset = split_brick_gap / 2.0 + new_half ;
     double cx = body.center.x;
     double cy = body.center.y;
 

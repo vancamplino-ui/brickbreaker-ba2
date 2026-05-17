@@ -42,6 +42,13 @@ namespace
     void write_paddle(std::ofstream& file, Paddle const& paddle);
     void write_bricks(std::ofstream& file, std::vector<Brick*> const& bricks);
     void write_balls(std::ofstream& file, std::vector<Ball> const& balls);
+
+    // --- physique du jeu ---
+    void resolve_bounces(Ball& ball, Point old_pos);
+    bool move_ball(Ball& ball);
+    void move_balls(std::vector<Ball>& balls);
+    void move_ball_paddle(Ball& ball);
+    void move_balls_paddle(std::vector<Ball>& balls);
 } // namespace
 
 Game::Game()
@@ -171,10 +178,6 @@ void Game::save(std::string const& filename) const
     write_balls(file, balls);
 }
 
-void Game::update()
-{
-    move_paddle_to(paddle.get_target_mouse());
-}
 
 bool Game::is_finished() const
 {
@@ -257,6 +260,14 @@ void Game::add_ball_on_paddle()
                            new_ball_radius},
                          {0.0, new_ball_delta_norm}));
     --lives;
+}
+
+void Game::update()
+{
+    move_balls(balls);                          // Phase 1
+    move_paddle_to(paddle.get_target_mouse());  // Phase 2
+    move_balls_paddle(balls);                   // Phase 3
+    // TODO : état final (LOST / WON + score)
 }
 
 namespace
@@ -558,4 +569,68 @@ namespace
                  << delta.y << '\n';
         }
     }
+
+
+    // === Physique du jeu ===
+
+    // Boucle de rebonds partagée (Phase 1 et Phase 3).
+    void resolve_bounces(Ball& ball, Point old_pos)
+    {
+        // TODO :
+        // tant que collision (bord, brique, autre balle, raquette) :
+        //   - annuler : revenir à old_pos
+        //   - si nb_rebonds < nb_rebonds_max :
+        //       - bord arène  : inverser delta.x ou delta.y
+        //       - brique      : réflexion via direction nominale
+        //       - autre balle : choc élastique (formule impulsion)
+        //       - raquette    : même formule, facteur de masse = 2
+        //       - translate(nouveau delta)
+        (void)ball; (void)old_pos;
+    }
+
+    // Phase 1 : déplace une balle et gère ses rebonds.
+    // Retourne true si la balle est tombée sous le bord inférieur.
+    bool move_ball(Ball& ball)
+    {
+        Point old_pos = ball.getBody().center;
+        ball.translate(ball.getDelta());
+
+        if (ball.getBody().center.y < 0.0)
+            return true;
+
+        resolve_bounces(ball, old_pos);
+        return false;
+    }
+
+    // Phase 1 : déplace toutes les balles et supprime celles tombées.
+    void move_balls(std::vector<Ball>& balls)
+    {
+        std::vector<size_t> to_remove;
+
+        for (size_t i = 0; i < balls.size(); ++i) {
+            if (move_ball(balls[i]))
+                to_remove.push_back(i);
+        }
+
+        for (int k = (int)to_remove.size() - 1; k >= 0; --k)
+            balls.erase(balls.begin() + to_remove[k]);
+    }
+
+    // Phase 3 : rebond raquette puis rebonds suivants pour une balle.
+    void move_ball_paddle(Ball& ball)
+    {
+        // TODO :
+        // si collision avec raquette :
+        //   - rebond raquette (formule impulsion, facteur 2, non compté)
+        //   - resolve_bounces(ball, old_pos)
+        (void)ball;
+    }
+
+    // Phase 3 : applique move_ball_paddle sur toutes les balles.
+    void move_balls_paddle(std::vector<Ball>& balls)
+    {
+        for (Ball& ball : balls)
+            move_ball_paddle(ball);
+    }
+
 } // namespace
