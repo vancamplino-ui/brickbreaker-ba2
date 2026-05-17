@@ -115,6 +115,42 @@ for i in $(seq -w 0 17); do
     ./project tests/t$i.txt
 done
 
+## Rendu 3 — Moteur physique du jeu
+
+### Architecture de game.cc
+
+Toute la physique est implémentée dans un namespace anonyme via une hiérarchie de sous-fonctions :
+
+```
+update()
+├── move_balls()              Phase 1 : déplace chaque balle
+│   └── move_ball()
+│       └── resolve_bounces()
+│           ├── detect_collisions()   détecte brique et balle-balle
+│           ├── bounce_brick()        réflexion direction nominale + hit() + score
+│           ├── bounce_ball()         collision élastique asymétrique
+│           ├── bounce_paddle()       identique à balle-balle avec rj = ∞
+│           └── bounce_arena()        réflexion sur les bords
+├── move_paddle_to()          Phase 2 : déplace la raquette
+└── move_balls_paddle()       Phase 3 : rebond raquette pour chaque balle
+    └── move_ball_paddle()
+        └── resolve_bounces()
+```
+
+### Règles physiques
+
+- **Brique** : réflexion par direction nominale (vecteur du centre balle vers point le plus proche du carré). `hit()` décrémente les points de vie (`RainbowBrick`), détruit la brique, et spawne de nouvelles briques (`SplitBrick`) ou une nouvelle balle (`BallBrick`).
+- **Balle-balle** : collision élastique asymétrique — seule la balle incidente est modifiée. Impulsion = `(-v_n + v_autre_n) * 2*r_autre² / (r² + r_autre²)`.
+- **Raquette** : même formule que balle-balle avec `rj → ∞` (fi = 2) et `delta` = dernier déplacement enregistré. Le rebond initial en phase 3 n'est pas compté dans `nb_rebonds`.
+- **Bords** : réflexion simple (`dx = -dx` ou `dy = -dy`). En cas de coin, le bord le plus pénétré est prioritaire.
+- **Norme bridée** : après tout rebond, `norm(delta) > delta_norm_max` → renormalisation.
+
+### État du jeu
+
+- **Victoire** : `bricks.empty()` → bonus `score_per_life * lives`.
+- **Défaite** : `balls.empty() && lives == 0`.
+- **Balle perdue** : centre `y < 0` après déplacement → supprimée du vecteur.
+
 ## 🔄 Workflow git
 
 A faire a chaque fois :
