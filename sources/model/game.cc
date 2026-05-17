@@ -44,11 +44,26 @@ namespace
     void write_balls(std::ofstream& file, std::vector<Ball> const& balls);
 
     // --- physique du jeu ---
-    void resolve_bounces(Ball& ball, Point old_pos);
-    bool move_ball(Ball& ball);
-    void move_balls(std::vector<Ball>& balls);
-    void move_ball_paddle(Ball& ball);
-    void move_balls_paddle(std::vector<Ball>& balls);
+    void resolve_bounces(Ball& ball, Point old_pos,
+                         std::vector<Brick*>& bricks,
+                         std::vector<Ball>& new_balls,
+                         int& score);
+    bool move_ball(Ball& ball,
+                   std::vector<Brick*>& bricks,
+                   std::vector<Ball>& new_balls,
+                   int& score);
+    void move_balls(std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks,
+                    int& score);
+    void move_ball_paddle(Ball& ball,
+                          std::vector<Brick*>& bricks,
+                          std::vector<Ball>& new_balls,
+                          Paddle const& paddle,
+                          int& score);
+    void move_balls_paddle(std::vector<Ball>& balls,
+                           std::vector<Brick*>& bricks,
+                           Paddle const& paddle,
+                           int& score);
 } // namespace
 
 Game::Game()
@@ -264,10 +279,11 @@ void Game::add_ball_on_paddle()
 
 void Game::update()
 {
-    move_balls(balls);                          // Phase 1
-    move_paddle_to(paddle.get_target_mouse());  // Phase 2
-    move_balls_paddle(balls);                   // Phase 3
-    // TODO : état final (LOST / WON + score)
+    move_balls(balls, bricks, score);
+    move_paddle_to(paddle.get_target_mouse());
+    move_balls_paddle(balls, bricks, paddle, score);
+    if (bricks.empty())
+        score += static_cast<int>(score_per_life) * lives;
 }
 
 namespace
@@ -574,23 +590,88 @@ namespace
     // === Physique du jeu ===
 
     // Boucle de rebonds partagée (Phase 1 et Phase 3).
-    void resolve_bounces(Ball& ball, Point old_pos)
+    void resolve_bounces(Ball& ball, Point old_pos,
+                         std::vector<Brick*>& bricks,
+                         std::vector<Ball>& new_balls,
+                         int& score)
     {
-        // TODO :
-        // tant que collision (bord, brique, autre balle, raquette) :
-        //   - annuler : revenir à old_pos
-        //   - si nb_rebonds < nb_rebonds_max :
-        //       - bord arène  : inverser delta.x ou delta.y
-        //       - brique      : réflexion via direction nominale
-        //       - autre balle : choc élastique (formule impulsion)
-        //       - raquette    : même formule, facteur de masse = 2
-        //       - translate(nouveau delta)
-        (void)ball; (void)old_pos;
+        unsigned nb_rebonds = 0;
+
+        while (nb_rebonds < nb_bounce_max) {
+            Circle body = ball.getBody();
+            bool hit_left  = (body.center.x - body.radius < epsil_zero);
+            bool hit_right = (body.center.x + body.radius > arena_size - epsil_zero);
+            bool hit_top   = (body.center.y + body.radius > arena_size - epsil_zero);
+
+            // collision brique
+            int brick_idx = -1;
+            for (size_t j = 0; j < bricks.size(); ++j) {
+                if (intersects(body, bricks[j]->getBody(), epsil_zero)) {
+                    brick_idx = static_cast<int>(j);
+                    break;
+                }
+            }
+
+            if (!hit_left && !hit_right && !hit_top && brick_idx < 0)
+                break;
+
+            ball.translate(old_pos - ball.getBody().center);
+            ++nb_rebonds;
+
+            if (brick_idx >= 0) {
+                Square sq = bricks[brick_idx]->getBody();
+                Point diff = sq.center - ball.getBody().center;
+                Point diff_borne = {
+                    std::clamp(diff.x, -sq.half_size, sq.half_size),
+                    std::clamp(diff.y, -sq.half_size, sq.half_size)
+                };
+                Point dir_nom = diff - diff_borne;
+                if (norm(dir_nom) >= epsil_zero) {
+                    Point n = normalized(dir_nom);
+                    double v_n = dot(ball.getDelta(), n);
+                    ball.setDelta(ball.getDelta() - n * (2.0 * v_n));
+                }
+                BrickType brick_type = bricks[brick_idx]->getType();
+                Point brick_center   = bricks[brick_idx]->getBody().center;
+                std::vector<Brick*> new_bricks;
+                bool destroyed = bricks[brick_idx]->hit(new_bricks);
+                score += score_per_hit;
+                if (destroyed) {
+                    if (brick_type == BALL)
+                        new_balls.push_back(Ball({brick_center, new_ball_radius},
+                                                 ball.getDelta()));
+                    delete bricks[brick_idx];
+                    bricks.erase(bricks.begin() + brick_idx);
+                }
+                for (Brick* b : new_bricks)
+                    bricks.push_back(b);
+
+            } else if (hit_left || hit_right || hit_top) {
+                if ((hit_left || hit_right) && hit_top) {
+                    double dist_x = std::max(
+                        body.radius - body.center.x,
+                        body.center.x + body.radius - arena_size);
+                    double dist_y = body.center.y + body.radius - arena_size;
+                    if (dist_x > dist_y) hit_top = false;
+                    else { hit_left = false; hit_right = false; }
+                }
+                Point delta = ball.getDelta();
+                if (hit_left || hit_right) delta.x = -delta.x;
+                if (hit_top)               delta.y = -delta.y;
+                ball.setDelta(delta);
+            }
+
+            old_pos = ball.getBody().center;
+            ball.translate(ball.getDelta());
+        }
     }
 
     // Phase 1 : déplace une balle et gère ses rebonds.
     // Retourne true si la balle est tombée sous le bord inférieur.
-    bool move_ball(Ball& ball)
+    bool move_ball(Ball& ball,
+                   std::vector<Brick*>& bricks,
+                   std::vector<Ball>& new_balls,
+                   int& score)
     {
         Point old_pos = ball.getBody().center;
         ball.translate(ball.getDelta());
@@ -598,39 +679,74 @@ namespace
         if (ball.getBody().center.y < 0.0)
             return true;
 
-        resolve_bounces(ball, old_pos);
+        resolve_bounces(ball, old_pos, bricks, new_balls, score);
         return false;
     }
 
     // Phase 1 : déplace toutes les balles et supprime celles tombées.
-    void move_balls(std::vector<Ball>& balls)
+    void move_balls(std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks,
+                    int& score)
     {
+        std::vector<Ball> new_balls;
         std::vector<size_t> to_remove;
 
         for (size_t i = 0; i < balls.size(); ++i) {
-            if (move_ball(balls[i]))
+            if (move_ball(balls[i], bricks, new_balls, score))
                 to_remove.push_back(i);
         }
 
-        for (int k = (int)to_remove.size() - 1; k >= 0; --k)
+        for (int k = static_cast<int>(to_remove.size()) - 1; k >= 0; --k)
             balls.erase(balls.begin() + to_remove[k]);
+
+        for (Ball& b : new_balls)
+            balls.push_back(b);
     }
 
     // Phase 3 : rebond raquette puis rebonds suivants pour une balle.
-    void move_ball_paddle(Ball& ball)
+    void move_ball_paddle(Ball& ball,
+                          std::vector<Brick*>& bricks,
+                          std::vector<Ball>& new_balls,
+                          Paddle const& paddle,
+                          int& score)
     {
-        // TODO :
-        // si collision avec raquette :
-        //   - rebond raquette (formule impulsion, facteur 2, non compté)
-        //   - resolve_bounces(ball, old_pos)
-        (void)ball;
+        if (!intersects(paddle.getArc(), ball.getBody(), epsil_zero))
+            return;
+
+        Circle ball_body  = ball.getBody();
+        Circle paddle_arc = paddle.getArc();
+
+        Point axis        = normalized(ball_body.center - paddle_arc.center);
+        Point di          = ball.getDelta();
+        Point dp          = paddle.getDelta();
+
+        double v_n        = dot(di, axis);
+        double v_paddle_n = dot(dp, axis);
+        double impulsion  = (-v_n + v_paddle_n) * 2.0;
+        Point new_delta   = di + axis * impulsion;
+
+        double n = norm(new_delta);
+        if (n > delta_norm_max)
+            new_delta = new_delta * (delta_norm_max / n);
+
+        ball.setDelta(new_delta);
+        ball.translate(ball.getDelta());
+
+        Point old_pos = ball.getBody().center;
+        resolve_bounces(ball, old_pos, bricks, new_balls, score);
     }
 
     // Phase 3 : applique move_ball_paddle sur toutes les balles.
-    void move_balls_paddle(std::vector<Ball>& balls)
+    void move_balls_paddle(std::vector<Ball>& balls,
+                           std::vector<Brick*>& bricks,
+                           Paddle const& paddle,
+                           int& score)
     {
+        std::vector<Ball> new_balls;
         for (Ball& ball : balls)
-            move_ball_paddle(ball);
+            move_ball_paddle(ball, bricks, new_balls, paddle, score);
+        for (Ball& b : new_balls)
+            balls.push_back(b);
     }
-
+    
 } // namespace

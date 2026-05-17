@@ -69,5 +69,11 @@ bool Paddle::is_valid(double eps) const
 
 void Paddle::move_to(double x)
 {
+    last_delta = {x - arc.center.x, 0.0};
     arc.center.x = x;
+}
+
+Point Paddle::getDelta() const
+{
+    return last_delta;
 }

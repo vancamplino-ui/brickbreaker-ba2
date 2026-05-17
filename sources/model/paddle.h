@@ -17,6 +17,7 @@ public:
     Circle getArc() const;
     double get_target_mouse() const;
     void set_target_mouse(double x);
+    Point getDelta() const;
 
     // contrôle des données fournies en entrée
     bool is_y_valid(double eps = 0) const;
@@ -29,6 +30,7 @@ private:
     double visible_half_width(double eps = 0) const;
     Circle arc; // on représente l'arc de la raquette visible par un cercle entier
     double target_mouse;
+    Point last_delta = {0.0, 0.0};
 };
 
 #endif
