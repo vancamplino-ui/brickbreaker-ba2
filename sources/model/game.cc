@@ -55,6 +55,7 @@ namespace
     void move_balls(std::vector<Ball>& balls,
                     std::vector<Brick*>& bricks,
                     int& score);
+    void bounce_balls(std::vector<Ball>& balls);
     void move_ball_paddle(Ball& ball,
                           std::vector<Brick*>& bricks,
                           std::vector<Ball>& new_balls,
@@ -279,11 +280,17 @@ void Game::add_ball_on_paddle()
 
 void Game::update()
 {
+    if (is_finished()) return;
     move_balls(balls, bricks, score);
+    bounce_balls(balls);
     move_paddle_to(paddle.get_target_mouse());
     move_balls_paddle(balls, bricks, paddle, score);
-    if (bricks.empty())
+    if (is_won()) {
         score += static_cast<int>(score_per_life) * lives;
+        std::cout << message::won();
+    } else if (is_lost()) {
+        std::cout << message::lost();
+    }
 }
 
 namespace
@@ -703,6 +710,40 @@ namespace
             balls.push_back(b);
     }
 
+    // collision entre balles (choc élastique)
+    void bounce_balls(std::vector<Ball>& balls)
+    {
+        for (size_t i = 0; i < balls.size(); ++i) {
+            for (size_t j = i + 1; j < balls.size(); ++j) {
+                if (!intersects(balls[i].getBody(), balls[j].getBody(), epsil_zero))
+                    continue;
+
+                Circle ci = balls[i].getBody();
+                Circle cj = balls[j].getBody();
+                Point axis = normalized(cj.center - ci.center);
+
+                double v_ni = dot(balls[i].getDelta(), axis);
+                double v_nj = dot(balls[j].getDelta(), axis);
+                double ri   = ci.radius;
+                double rj   = cj.radius;
+
+                double fi = 2.0 * rj * rj / (ri * ri + rj * rj);
+                double fj = 2.0 * ri * ri / (ri * ri + rj * rj);
+
+                Point di = balls[i].getDelta() + axis * ((-v_ni + v_nj) * fi);
+                Point dj = balls[j].getDelta() + axis * ((-v_nj + v_ni) * fj);
+
+                double ni = norm(di);
+                double nj = norm(dj);
+                if (ni > delta_norm_max) di = di * (delta_norm_max / ni);
+                if (nj > delta_norm_max) dj = dj * (delta_norm_max / nj);
+
+                balls[i].setDelta(di);
+                balls[j].setDelta(dj);
+            }
+        }
+    }
+
     // Phase 3 : rebond raquette puis rebonds suivants pour une balle.
     void move_ball_paddle(Ball& ball,
                           std::vector<Brick*>& bricks,
@@ -748,5 +789,5 @@ namespace
         for (Ball& b : new_balls)
             balls.push_back(b);
     }
-    
+
 } // namespace

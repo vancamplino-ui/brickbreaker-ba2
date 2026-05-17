@@ -11,6 +11,7 @@
 #include "graphic.h"
 #include "graphic_gui.h"
 #include "gui.h"
+#include "message.h"
 
 using namespace std;
 
