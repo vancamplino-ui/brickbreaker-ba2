@@ -628,11 +628,18 @@ namespace
             std::clamp(diff.y, -sq.half_size, sq.half_size)
         };
         Point dir_nom = diff - diff_borne;
+        Point n;
         if (norm(dir_nom) >= epsil_zero) {
-            Point n = normalized(dir_nom);
-            double v_n = dot(ball.getDelta(), n);
-            ball.setDelta(ball.getDelta() - n * (2.0 * v_n));
+            n = normalized(dir_nom);
+        } else {
+            n = {0.0, 0.0};
+            if (std::abs(diff.x) > std::abs(diff.y))
+                n.x = (diff.x > 0) ? 1.0 : -1.0;
+            else
+                n.y = (diff.y > 0) ? 1.0 : -1.0;
         }
+        double v_n = dot(ball.getDelta(), n);
+        ball.setDelta(ball.getDelta() - n * (2.0 * v_n));
         BrickType brick_type = bricks[brick_idx]->getType();
         Point brick_center   = bricks[brick_idx]->getBody().center;
         std::vector<Brick*> new_bricks;
@@ -678,9 +685,10 @@ namespace
     {
         Circle ball_body  = ball.getBody();
         Circle paddle_arc = paddle.getArc();
-        Point axis  = normalized(paddle_arc.center - ball_body.center);
+        Point axis  = normalized(ball_body.center - paddle_arc.center);
         double v_n  = dot(ball.getDelta(), axis);
         double v_nj = dot(paddle.getDelta(), axis);
+        if (v_n - v_nj >= 0) return;
         Point new_delta = ball.getDelta() + axis * ((-v_n + v_nj) * 2.0);
         double n = norm(new_delta);
         if (n > delta_norm_max) new_delta = new_delta * (delta_norm_max / n);

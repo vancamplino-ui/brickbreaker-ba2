@@ -66,6 +66,10 @@ My_window::My_window(string file_name)
         }
     }
 
+    buttons[SAVE].set_sensitive(arena_visible);
+    buttons[RESTART].set_sensitive(arena_visible);
+    buttons[START].set_sensitive(arena_visible && !game.is_finished());
+    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
 }
@@ -120,6 +124,10 @@ void My_window::restart_clicked()
         arena_visible = false;
     }
 
+    buttons[SAVE].set_sensitive(arena_visible);
+    buttons[RESTART].set_sensitive(arena_visible);
+    buttons[START].set_sensitive(arena_visible && !game.is_finished());
+    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
 }
@@ -161,6 +169,10 @@ void My_window::step_clicked()
     game.update();
     update_infos();
     drawing.queue_draw();
+    if (game.is_finished()) {
+        buttons[STEP].set_sensitive(false);
+        buttons[START].set_sensitive(false);
+    }
 }
 void My_window::set_key_controller()
 {
@@ -237,6 +249,10 @@ void My_window::handle_open_file(std::filesystem::path const& file_name,
         arena_visible = false;
     }
 
+    buttons[SAVE].set_sensitive(arena_visible);
+    buttons[RESTART].set_sensitive(arena_visible);
+    buttons[START].set_sensitive(arena_visible && !game.is_finished());
+    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
     dialog->hide();
@@ -297,6 +313,8 @@ bool My_window::loop()
 
     if (game.is_finished()) {
         stop_loop();
+        buttons[STEP].set_sensitive(false);
+        buttons[START].set_sensitive(false);
         return false;
     }
 
@@ -306,6 +324,8 @@ bool My_window::loop()
 
     if (game.is_finished()) {
         stop_loop();
+        buttons[STEP].set_sensitive(false);
+        buttons[START].set_sensitive(false);
         return false;
     }
 
