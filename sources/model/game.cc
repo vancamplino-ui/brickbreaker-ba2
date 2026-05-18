@@ -357,7 +357,6 @@ namespace
         for (Brick* brick : bricks) {
             delete brick;
         }
-
         bricks.clear();
     }
 
@@ -369,7 +368,6 @@ namespace
             std::cout << message::invalid_score(score);
             return false;
         }
-
         return true;
     }
 
@@ -680,12 +678,9 @@ namespace
     {
         Circle ball_body  = ball.getBody();
         Circle paddle_arc = paddle.getArc();
-        // même formule que balle-balle : axis de la balle vers la raquette
         Point axis  = normalized(paddle_arc.center - ball_body.center);
         double v_n  = dot(ball.getDelta(), axis);
-        if (v_n <= 0) return;  // balle déjà en train de s'éloigner → pas de rebond
         double v_nj = dot(paddle.getDelta(), axis);
-        // rayon raquette → ∞  =>  fi = 2*rj²/(ri²+rj²) → 2
         Point new_delta = ball.getDelta() + axis * ((-v_n + v_nj) * 2.0);
         double n = norm(new_delta);
         if (n > delta_norm_max) new_delta = new_delta * (delta_norm_max / n);
@@ -782,11 +777,14 @@ namespace
     {
         Point old_pos = ball.getBody().center;
         ball.translate(ball.getDelta());
-
+        
         if (ball.getBody().center.y < 0.0)
             return true;
 
         resolve_bounces(ball, old_pos, balls, bricks, new_balls, paddle, bounced, score);
+
+        
+
         return false;
     }
 
@@ -824,9 +822,9 @@ namespace
             return;
 
         bounce_paddle(ball, paddle);  // pas compté dans nb_rebonds
+        ball.translate(ball.getDelta());
 
         Point old_pos = ball.getBody().center;
-        ball.translate(ball.getDelta());
         std::set<size_t> bounced;
         resolve_bounces(ball, old_pos, balls, bricks, new_balls, paddle, bounced, score);
     }
