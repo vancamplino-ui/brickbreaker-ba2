@@ -1,0 +1,21 @@
+# output: "Correct file"
+# Test: balle vs RainbowBrick (type 0)
+# Balle monte vers la brique rainbow au centre, 2 briques laterales de repere
+# score
+0
+
+# lives
+3
+
+# paddle
+50 -16 20
+
+# bricks
+3
+0 50 62 5 4
+0 30 62 4 1
+0 70 62 4 1
+
+# balls
+1
+50 20 1 0 0.8

@@ -1,0 +1,23 @@
+# output: "Correct file"
+# Test: balle vs SplitBrick (type 2)
+# Balle monte vers la SplitBrick (taille 12) au centre
+# La brique doit se subdiviser en 4 enfants de taille (12-3)/2 = 4.5 chacun
+# 2 briques laterales de repere
+# score
+0
+
+# lives
+3
+
+# paddle
+50 -16 20
+
+# bricks
+3
+2 50 65 12
+0 20 65 4 1
+0 80 65 4 1
+
+# balls
+1
+50 20 1 0 0.8

@@ -639,7 +639,8 @@ namespace
                 n.y = (diff.y > 0) ? 1.0 : -1.0;
         }
         double v_n = dot(ball.getDelta(), n);
-        ball.setDelta(ball.getDelta() - n * (2.0 * v_n));
+        Point old_delta = ball.getDelta();
+        ball.setDelta(old_delta - n * (2.0 * v_n));
         BrickType brick_type = bricks[brick_idx]->getType();
         Point brick_center   = bricks[brick_idx]->getBody().center;
         std::vector<Brick*> new_bricks;
@@ -647,7 +648,7 @@ namespace
         score += score_per_hit;
         if (destroyed) {
             if (brick_type == BALL)
-                new_balls.push_back(Ball({brick_center, new_ball_radius}, ball.getDelta()));
+                new_balls.push_back(Ball({brick_center, new_ball_radius}, old_delta));
             delete bricks[brick_idx];
             bricks.erase(bricks.begin() + brick_idx);
         }
@@ -688,8 +689,8 @@ namespace
         Point axis  = normalized(ball_body.center - paddle_arc.center);
         double v_n  = dot(ball.getDelta(), axis);
         double v_nj = dot(paddle.getDelta(), axis);
-        if (v_n - v_nj >= 0) return;
         Point new_delta = ball.getDelta() + axis * ((-v_n + v_nj) * 2.0);
+        if (new_delta.y < 0.0) new_delta.y = -new_delta.y;
         double n = norm(new_delta);
         if (n > delta_norm_max) new_delta = new_delta * (delta_norm_max / n);
         ball.setDelta(new_delta);
@@ -741,14 +742,16 @@ namespace
                          std::set<size_t>& bounced,
                          int& score)
     {
-        unsigned nb_rebonds = 0;
+        unsigned nb_rebonds  = 0;
+        bool paddle_bounced  = false;
 
         while (nb_rebonds < nb_bounce_max) {
             Circle body = ball.getBody();
             bool hit_left   = (body.center.x - body.radius < epsil_zero);
             bool hit_right  = (body.center.x + body.radius > arena_size - epsil_zero);
             bool hit_top    = (body.center.y + body.radius > arena_size - epsil_zero);
-            bool hit_paddle = intersects(paddle.getArc(), body, epsil_zero);
+            bool hit_paddle = !paddle_bounced
+                              && intersects(paddle.getArc(), body, epsil_zero);
             int brick_idx = -1;
             int ball_idx  = -1;
             detect_collisions(body, ball, balls, bricks, bounced, brick_idx, ball_idx);
@@ -763,9 +766,10 @@ namespace
                 bounce_brick(ball, brick_idx, bricks, new_balls, score);
             else if (ball_idx >= 0)
                 bounce_ball(ball, body, ball_idx, balls, bounced);
-            else if (hit_paddle)
+            else if (hit_paddle) {
                 bounce_paddle(ball, paddle);
-            else
+                paddle_bounced = true;
+            } else
                 bounce_arena(ball, body, hit_left, hit_right, hit_top);
 
             old_pos = ball.getBody().center;
@@ -830,6 +834,21 @@ namespace
             return;
 
         bounce_paddle(ball, paddle);  // pas compté dans nb_rebonds
+
+        // Dépénétration : sortir la balle hors de la zone eps du paddle
+        // pour éviter qu'un 2e rebond paddle s'enclenche dans resolve_bounces.
+        {
+            Circle bd    = ball.getBody();
+            Circle pa    = paddle.getArc();
+            double d     = distance(bd.center, pa.center);
+            double limit = bd.radius + pa.radius + epsil_zero;
+            if (d < limit) {
+                Point ax = (d > epsil_zero) ? normalized(bd.center - pa.center)
+                                            : Point{0.0, 1.0};
+                ball.translate(ax * (limit - d));
+            }
+        }
+
         ball.translate(ball.getDelta());
 
         Point old_pos = ball.getBody().center;

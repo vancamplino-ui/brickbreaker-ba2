@@ -1,0 +1,22 @@
+# output: "Correct file"
+# Test: balle vs BallBrick (type 1)
+# Balle monte vers la BallBrick au centre, qui doit spawner une nouvelle balle
+# 2 briques laterales de repere
+# score
+0
+
+# lives
+3
+
+# paddle
+50 -16 20
+
+# bricks
+3
+1 50 62 5
+0 25 62 4 1
+0 75 62 4 1
+
+# balls
+1
+50 20 1 0 0.8
