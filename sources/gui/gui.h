@@ -1,7 +1,7 @@
 // gui.h : déclaration de la classe My_window
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 26.04.2026
+// Version : 1.0 du 24.05.2026
 
 #ifndef GUI_H
 #define GUI_H

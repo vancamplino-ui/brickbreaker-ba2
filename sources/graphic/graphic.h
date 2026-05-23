@@ -1,7 +1,7 @@
 // graphic.h : déclaration des fonctions de dessin Cairo
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 26.04.2026
+// Version : 1.0 du 24.05.2026
 
 #ifndef GRAPHIC_H
 #define GRAPHIC_H

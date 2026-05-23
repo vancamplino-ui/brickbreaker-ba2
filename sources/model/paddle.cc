@@ -1,7 +1,7 @@
 // paddle.cc  : definition des methodes de la classe Paddle
 //
 // Auteur   : Liam Van Camp
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #include <cmath>
 

@@ -1,7 +1,7 @@
 // graphic.cc : dessin des entités du jeu via Cairo
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 26.04.2026
+// Version : 1.0 du 24.05.2026
 
 #include <cmath>
 
@@ -14,8 +14,8 @@ static const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
 namespace
 {
-    constexpr double two_pi = 6.28318530717958647692;
-    constexpr double pi = 3.14159265358979323846;
+    constexpr double TWO_PI = 6.28318530717958647692;
+    constexpr double PI = 3.14159265358979323846;
     Color rainbow_color_from_hit_points(int hit_points);
     void fill_square(Square const& square);
     void fill_circle(Circle const& circle);
@@ -144,7 +144,7 @@ void draw_paddle(Circle const& arc)
     //sin(t) = -y / r
     const double ratio(-arc.center.y / arc.radius);
     const double start_angle(std::asin(ratio));
-    const double end_angle(pi - start_angle);
+    const double end_angle(PI - start_angle);
 
     set_color(BLACK);
     (*ptcr)->set_line_width(1.0);
@@ -183,7 +183,7 @@ namespace
                      circle.center.y,
                      circle.radius,
                      0.0,
-                     two_pi);
+                     TWO_PI);
         (*ptcr)->fill();
     }
 

@@ -1,7 +1,7 @@
 // gui.cc : gestion de l'interface graphique GTKmm
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 26.04.2026
+// Version : 1.0 du 24.05.2026
 
 #include <algorithm>
 #include <filesystem>
@@ -162,7 +162,6 @@ void My_window::start_clicked()
         buttons[START].set_label("start");
 
     }
-
 }
 void My_window::step_clicked()
 {

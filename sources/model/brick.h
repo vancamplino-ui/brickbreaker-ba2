@@ -1,7 +1,7 @@
 // brick.h  : declaration des classes de briques
 //
 // Auteur   : Victor Henri Willy Eder
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #ifndef BRICK_H
 #define BRICK_H
@@ -33,7 +33,6 @@ public:
 protected:
     Square body;
     BrickType type;
-
 };
 
 class RainbowBrick : public Brick
@@ -69,4 +68,4 @@ public:
     bool hit(std::vector<Brick*>& new_bricks) override;
 };
 
-#endif 
+#endif

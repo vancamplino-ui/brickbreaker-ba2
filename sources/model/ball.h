@@ -1,7 +1,7 @@
 // ball.h  : declaration de la classe Ball
 //
 // Auteur   : Victor Henri Willy Eder
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #ifndef BALL_H
 #define BALL_H

@@ -1,7 +1,7 @@
 // game.cc  : lecture du fichier de jeu et validations initiales
 //
 // Auteurs  : Liam Van Camp, Victor Henri Willy Eder
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #include <cmath>
 #include <fstream>
@@ -171,7 +171,6 @@ bool Game::paddle_intersects_ball()
     return false;
 }
 
-
 bool Game::load(std::string const& filename)
 {
     int new_score = 0;
@@ -216,7 +215,6 @@ void Game::save(std::string const& filename) const
     write_bricks(file, bricks);
     write_balls(file, balls);
 }
-
 
 bool Game::is_finished() const
 {
@@ -613,7 +611,6 @@ namespace
         }
     }
 
-
     // === Physique du jeu ===
 
     void bounce_brick(Ball& ball, int brick_idx,
@@ -721,15 +718,19 @@ namespace
     {
         brick_idx = -1;
         for (size_t j = 0; j < bricks.size(); ++j)
-            if (intersects(body, bricks[j]->getBody(), epsil_zero))
-                { brick_idx = static_cast<int>(j); break; }
+            if (intersects(body, bricks[j]->getBody(), epsil_zero)) {
+                brick_idx = static_cast<int>(j);
+                break;
+            }
 
         ball_idx = -1;
         for (size_t j = 0; j < balls.size(); ++j) {
             if (&balls[j] == &ball) continue;
             if (bounced.count(j)) continue;  // déjà mis à jour symétriquement
-            if (intersects(body, balls[j].getBody(), epsil_zero))
-                { ball_idx = static_cast<int>(j); break; }
+            if (intersects(body, balls[j].getBody(), epsil_zero)) {
+                ball_idx = static_cast<int>(j);
+                break;
+            }
         }
     }
 
@@ -742,8 +743,8 @@ namespace
                          std::set<size_t>& bounced,
                          int& score)
     {
-        unsigned nb_rebonds  = 0;
-        bool paddle_bounced  = false;
+        unsigned nb_rebonds = 0;
+        bool paddle_bounced = false;
 
         while (nb_rebonds < nb_bounce_max) {
             Circle body = ball.getBody();
@@ -789,14 +790,11 @@ namespace
     {
         Point old_pos = ball.getBody().center;
         ball.translate(ball.getDelta());
-        
         if (ball.getBody().center.y < 0.0)
             return true;
 
-        resolve_bounces(ball, old_pos, balls, bricks, new_balls, paddle, bounced, score);
-
-        
-
+        resolve_bounces(ball, old_pos, balls, bricks,
+                        new_balls, paddle, bounced, score);
         return false;
     }
 
@@ -853,7 +851,8 @@ namespace
 
         Point old_pos = ball.getBody().center;
         std::set<size_t> bounced;
-        resolve_bounces(ball, old_pos, balls, bricks, new_balls, paddle, bounced, score);
+        resolve_bounces(ball, old_pos, balls, bricks,
+                        new_balls, paddle, bounced, score);
     }
 
     // Phase 3 : applique move_ball_paddle sur toutes les balles.

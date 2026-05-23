@@ -1,7 +1,7 @@
 // constants.h  : constantes globales du projet
 //
 // Auteur       : copie de la verstion transmise par le professeur
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H

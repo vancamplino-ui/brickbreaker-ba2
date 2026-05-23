@@ -1,7 +1,7 @@
 // brick.cc  : definition des methodes des classes de briques
 //
 // Auteur   : Victor Henri Willy Eder
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #include "../tools/constants.h"
 
@@ -101,7 +101,7 @@ bool SplitBrick::hit(std::vector<Brick*>& new_bricks)
 
     if (new_half * 2 < brick_size_min) return true;
 
-    double offset = split_brick_gap / 2.0 + new_half ;
+    double offset = split_brick_gap / 2.0 + new_half;
     double cx = body.center.x;
     double cy = body.center.y;
 

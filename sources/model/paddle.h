@@ -1,7 +1,7 @@
 // paddle.h  : declaration de la classe Paddle
 //
 // Auteur   : Liam Van Camp
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #ifndef PADDLE_H
 #define PADDLE_H
@@ -22,7 +22,7 @@ public:
     // contrôle des données fournies en entrée
     bool is_y_valid(double eps = 0) const;
     bool is_x_valid(double eps = 0) const;
-    bool is_visible(double eps = 0) const;    
+    bool is_visible(double eps = 0) const;
     bool is_valid(double eps = 0) const;
     void move_to(double x);
 

@@ -1,7 +1,7 @@
 // tools.cc  : definition des fonctions utilitaires geometriques
 //
 // Auteur    : Liam Van Camp
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #include <algorithm>
 #include <cmath>
@@ -33,7 +33,6 @@ Point normalized(Point p)
 
     return p / p_norm;
 }
-
 
 bool is_inside(Circle c, Point p, double eps)
 {
