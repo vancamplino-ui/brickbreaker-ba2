@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.29)  22 MAY 2026 19:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.29)  22 MAY 2026 19:12
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -380,7 +380,8 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count315
 \l__pdf_internal_box=\box58
-) (./rapport_rendu3.aux)
+)
+No file rapport_rendu3.aux.
 \openout1 = `rapport_rendu3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
@@ -409,7 +410,6 @@ Package french.ldf Info: Setting StandardEnumerateEnv=true for
 (french.ldf)             compatibility with enumitem package,
 (french.ldf)             reported on input line 45.
 LaTeX Info: Redefining \up on input line 45.
-
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -467,7 +467,6 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring OFF on input line 45.
- (./rapport_rendu3.out) (./rapport_rendu3.out)
 \@outlinefile=\write3
 \openout3 = `rapport_rendu3.out'.
 
@@ -498,68 +497,90 @@ Package microtype Info: Loading generic protrusion settings for font family
 <photo_rapport_3/B1.png, id=4, 309.155pt x 658.46pt>
 File: photo_rapport_3/B1.png Graphic file (type png)
 <use photo_rapport_3/B1.png>
-Package pdftex.def Info: photo_rapport_3/B1.png  used on input line 101.
+Package pdftex.def Info: photo_rapport_3/B1.png  used on input line 98.
 (pdftex.def)             Requested size: 44.55602pt x 94.89653pt.
 <photo_rapport_3/B2.png, id=5, 319.1925pt x 646.415pt>
 File: photo_rapport_3/B2.png Graphic file (type png)
 <use photo_rapport_3/B2.png>
-Package pdftex.def Info: photo_rapport_3/B2.png  used on input line 106.
+Package pdftex.def Info: photo_rapport_3/B2.png  used on input line 103.
 (pdftex.def)             Requested size: 46.78603pt x 94.74864pt.
 <photo_rapport_3/B3.png, id=6, 335.2525pt x 634.37pt>
 File: photo_rapport_3/B3.png Graphic file (type png)
 <use photo_rapport_3/B3.png>
-Package pdftex.def Info: photo_rapport_3/B3.png  used on input line 111.
+Package pdftex.def Info: photo_rapport_3/B3.png  used on input line 108.
 (pdftex.def)             Requested size: 47.89763pt x 90.63097pt.
 <photo_rapport_3/B4.png, id=7, 365.365pt x 618.31pt>
 File: photo_rapport_3/B4.png Graphic file (type png)
 <use photo_rapport_3/B4.png>
-Package pdftex.def Info: photo_rapport_3/B4.png  used on input line 116.
+Package pdftex.def Info: photo_rapport_3/B4.png  used on input line 113.
 (pdftex.def)             Requested size: 55.69586pt x 94.25203pt.
 <photo_rapport_3/rb1.png, id=8, 469.755pt x 139.52126pt>
 File: photo_rapport_3/rb1.png Graphic file (type png)
 <use photo_rapport_3/rb1.png>
-Package pdftex.def Info: photo_rapport_3/rb1.png  used on input line 142.
-(pdftex.def)             Requested size: 100.25482pt x 29.77507pt.
+Package pdftex.def Info: photo_rapport_3/rb1.png  used on input line 137.
+(pdftex.def)             Requested size: 123.76944pt x 36.76006pt.
 <photo_rapport_3/rb2.png, id=9, 469.755pt x 139.52126pt>
 File: photo_rapport_3/rb2.png Graphic file (type png)
 <use photo_rapport_3/rb2.png>
-Package pdftex.def Info: photo_rapport_3/rb2.png  used on input line 146.
-(pdftex.def)             Requested size: 100.25482pt x 29.77507pt.
+Package pdftex.def Info: photo_rapport_3/rb2.png  used on input line 141.
+(pdftex.def)             Requested size: 123.76944pt x 36.76006pt.
 <photo_rapport_3/rb3.png, id=10, 469.755pt x 139.52126pt>
 File: photo_rapport_3/rb3.png Graphic file (type png)
 <use photo_rapport_3/rb3.png>
-Package pdftex.def Info: photo_rapport_3/rb3.png  used on input line 150.
-(pdftex.def)             Requested size: 100.25482pt x 29.77507pt.
+Package pdftex.def Info: photo_rapport_3/rb3.png  used on input line 145.
+(pdftex.def)             Requested size: 123.76944pt x 36.76006pt.
 <photo_rapport_3/bb1.png, id=11, 570.13pt x 195.73125pt>
 File: photo_rapport_3/bb1.png Graphic file (type png)
 <use photo_rapport_3/bb1.png>
-Package pdftex.def Info: photo_rapport_3/bb1.png  used on input line 174.
-(pdftex.def)             Requested size: 111.39363pt x 38.2406pt.
+Package pdftex.def Info: photo_rapport_3/bb1.png  used on input line 162.
+(pdftex.def)             Requested size: 123.76944pt x 42.49055pt.
 <photo_rapport_3/bb2.png, id=12, 570.13pt x 195.73125pt>
 File: photo_rapport_3/bb2.png Graphic file (type png)
 <use photo_rapport_3/bb2.png>
-Package pdftex.def Info: photo_rapport_3/bb2.png  used on input line 178.
-(pdftex.def)             Requested size: 111.39363pt x 38.2406pt.
+Package pdftex.def Info: photo_rapport_3/bb2.png  used on input line 166.
+(pdftex.def)             Requested size: 123.76944pt x 42.49055pt.
 <photo_rapport_3/bb3.png, id=13, 570.13pt x 195.73125pt>
 File: photo_rapport_3/bb3.png Graphic file (type png)
 <use photo_rapport_3/bb3.png>
-Package pdftex.def Info: photo_rapport_3/bb3.png  used on input line 182.
-(pdftex.def)             Requested size: 111.39363pt x 38.2406pt.
+Package pdftex.def Info: photo_rapport_3/bb3.png  used on input line 170.
+(pdftex.def)             Requested size: 123.76944pt x 42.49055pt.
+
+/Users/liamvancamp/Desktop/EPFL/BA2/ICC_2/ICC_2_proj/PROJET_BRICK_BREAKER/rapport_3/rapport_rendu3.tex:187: Missing number, treated as zero.
+<to be read again> 
+                   }
+l.187 begin{minipage}[t]{0.25\textwidth}
+                                        
+A number should have been here; I inserted `0'.
+(If you can't figure out why I needed to see a number,
+look up `weird error' in the index to The TeXbook.)
+
+/Users/liamvancamp/Desktop/EPFL/BA2/ICC_2/ICC_2_proj/PROJET_BRICK_BREAKER/rapport_3/rapport_rendu3.tex:187: Illegal unit of measure (pt inserted).
+<to be read again> 
+                   }
+l.187 begin{minipage}[t]{0.25\textwidth}
+                                        
+Dimensions can be in units of em, ex, in, pt, pc,
+cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
+I'll assume that you meant to say pt, for printer's points.
+To recover gracefully from this error, it's best to
+delete the erroneous units; e.g., type `2' to delete
+two letters. (See Chapter 27 of The TeXbook.)
+
 <photo_rapport_3/sb1.png, id=14, 670.505pt x 260.975pt>
 File: photo_rapport_3/sb1.png Graphic file (type png)
 <use photo_rapport_3/sb1.png>
-Package pdftex.def Info: photo_rapport_3/sb1.png  used on input line 203.
-(pdftex.def)             Requested size: 111.39363pt x 43.35368pt.
+Package pdftex.def Info: photo_rapport_3/sb1.png  used on input line 189.
+(pdftex.def)             Requested size: 123.76944pt x 48.17209pt.
 <photo_rapport_3/sb2.png, id=15, 670.505pt x 260.975pt>
 File: photo_rapport_3/sb2.png Graphic file (type png)
 <use photo_rapport_3/sb2.png>
-Package pdftex.def Info: photo_rapport_3/sb2.png  used on input line 207.
-(pdftex.def)             Requested size: 111.39363pt x 43.35368pt.
+Package pdftex.def Info: photo_rapport_3/sb2.png  used on input line 193.
+(pdftex.def)             Requested size: 123.76944pt x 48.17209pt.
 <photo_rapport_3/sb3.png, id=16, 670.505pt x 260.975pt>
 File: photo_rapport_3/sb3.png Graphic file (type png)
 <use photo_rapport_3/sb3.png>
-Package pdftex.def Info: photo_rapport_3/sb3.png  used on input line 211.
-(pdftex.def)             Requested size: 111.39363pt x 43.35368pt.
+Package pdftex.def Info: photo_rapport_3/sb3.png  used on input line 197.
+(pdftex.def)             Requested size: 123.76944pt x 48.17209pt.
 
 
 [1{/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
@@ -571,22 +592,29 @@ Package pdftex.def Info: photo_rapport_3/sb3.png  used on input line 211.
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
-Package rerunfilecheck Info: File `rapport_rendu3.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+
+
+Package rerunfilecheck Warning: File `rapport_rendu3.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `rapport_rendu3.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 16514 strings out of 473190
- 273089 string characters out of 5715800
- 740530 words of memory out of 5000000
- 39495 multiletter control sequences out of 15000+600000
- 572789 words of font info for 98 fonts, out of 8000000 for 9000
+ 16496 strings out of 473190
+ 272812 string characters out of 5715800
+ 736539 words of memory out of 5000000
+ 39491 multiletter control sequences out of 15000+600000
+ 572571 words of font info for 94 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,11n,79p,1095b,465s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on rapport_rendu3.pdf (2 pages, 247466 bytes).
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on rapport_rendu3.pdf (2 pages, 236859 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 68 compressed objects within 1 object stream
+ 108 PDF objects out of 1000 (max. 8388607)
+ 65 compressed objects within 1 object stream
  13 named destinations out of 1000 (max. 500000)
  34370 words of extra memory for PDF output out of 35830 (max. 10000000)
 

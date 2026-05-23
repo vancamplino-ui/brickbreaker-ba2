@@ -37,7 +37,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{Victor Henri Willy Eder\\Liam Van Camp}
-\rhead{27 mars 2026\\EPFL Microtechnique}
+\rhead{24 mai 2026\\EPFL Microtechnique}
 \renewcommand{\headrulewidth}{0pt}
 \setlength{\headheight}{28pt}
 \setlength{\headsep}{18pt}
@@ -46,7 +46,7 @@
 \begin{center}
     {\huge \textbf{Rapport d'activit\'e -- Rendu 3}}
 \end{center}
-\vspace{0.5cm}
+\vspace{0.1cm}
 
 % ============================================================
 \section*{Partie 1 — Dynamiques du jeu}
@@ -68,7 +68,7 @@
     \item \texttt{Brick} : ajout de la méthode virtuelle pure
       \texttt{hit()} dans la hiérarchie de classes.
     \item \texttt{Game} : réécriture complète de \texttt{update()}
-      avec les trois phases de la dynamique.
+      avec les trois phases de la dynamique et toutes ses sous-fonctions.
     % Ajoutez ou supprimez des points selon vos vrais changements
 \end{itemize}
 
@@ -78,17 +78,19 @@
 
 \noindent
 \begin{minipage}[t]{0.50\textwidth}
-La balle $A$ (petite, rayon $r_a$) se d\'{e}place et entre en
-contact avec la balle $B$ (grande, rayon $r_b$). La collision est
-d\'{e}tect\'{e}e d\`{e}s que la distance entre leurs centres est
-inf\'{e}rieure \`{a} $r_a + r_b + \epsilon$.
-
-\medskip
-Lors de l'impact, les deux balles rebondissent~: une impulsion est
-appliqu\'{e}e le long de l'axe reliant leurs centres,
-pond\'{e}r\'{e}e par le rapport des rayons. Les composantes
-tangentielles restent inchang\'{e}es et les normes des deltas sont
-born\'{e}es \`{a} \texttt{delta\_norm\_max}.
+Dans \texttt{update()}, \texttt{detect\_collisions()} parcourt
+toutes les paires et signale un contact d\`{e}s que la distance
+entre centres est $< r_a + r_b + \epsilon$.
+\texttt{bounce\_ball()} projette alors le delta de chaque balle
+sur l'axe des centres (produit scalaire \texttt{dot}), calcule
+les facteurs d'\'{e}change $f_i = r_b/(r_a+r_b)$ et
+$f_j = r_a/(r_a+r_b)$, puis met \`{a} jour les deltas via
+\texttt{setDelta()}~: la composante normale de $A$ augmente,
+celle de $B$ diminue. Selon l'intensit\'{e}, $B$ peut inverser
+sa direction ou simplement ralentir. Les composantes tangentielles
+restent inchang\'{e}es. Les balles sont ensuite s\'{e}par\'{e}es
+(\texttt{translate()}) et leurs deltas born\'{e}s \`{a}
+\texttt{delta\_norm\_max}.
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -123,71 +125,95 @@ born\'{e}es \`{a} \texttt{delta\_norm\_max}.
 \subsection*{1.3 Destruction de chaque type de brique}
 % ------------------------------------------------------------
 
-% --- Ligne 1 : RainbowBrick ---
-\noindent
-\begin{minipage}[t]{0.60\textwidth}
-\textbf{RainbowBrick} : \`{a} chaque impact, la brique perd
-1 \texttt{hit\_point} et sa couleur change. Elle est
-d\'{e}truite lorsque ses points de vie atteignent z\'{e}ro.
+% --- RainbowBrick ---
+\textbf{RainbowBrick} : \texttt{bounce\_brick()} d\'{e}termine la
+face touch\'{e}e en comparant les recouvrements horizontal et
+vertical, r\'{e}fl\'{e}chit le delta de la balle via
+\texttt{setDelta()}, puis appelle \texttt{hit()}~: le compteur
+\texttt{hit\_points} est d\'{e}cr\'{e}ment\'{e} et l'index de
+couleur est incr\'{e}ment\'{e} modulo la taille du cycle. Quand
+\texttt{hit\_points} atteint z\'{e}ro, \texttt{hit()} renvoie
+\texttt{true} et la brique est supprim\'{e}e~: (a)~\'{e}tat
+initial, (b)~apr\`{e}s un impact, (c)~d\'{e}truite.
+
+\begin{center}
+\begin{minipage}[t]{0.75\textwidth}
+\begin{minipage}[t]{0.27\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/rb1.png}\\[1pt]
+{\small(a)}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.27\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/rb2.png}\\[1pt]
+{\small(b)}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.27\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/rb3.png}\\[1pt]
+{\small(c)}
+\end{minipage}
+\end{minipage}
+\end{center}
+\vspace{0.5cm}
+\medskip
+% --- BallBrick ---
+\textbf{BallBrick} : (a)~brique intacte. (b)~\texttt{bounce\_brick()}
+sauvegarde \texttt{old\_delta = ball.getDelta()} avant toute
+r\'{e}flexion, r\'{e}fl\'{e}chit la balle frappante, puis appelle
+\texttt{hit()}~: la brique est imm\'{e}diatement d\'{e}truite
+(\texttt{hit()} renvoie \texttt{true}) et un \texttt{Ball} centr\'{e}
+sur la brique est pouss\'{e} dans \texttt{new\_balls} avec
+\texttt{old\_delta}, capturant ainsi la direction avant rebond.
+(c)~la balle frappante continue avec son delta r\'{e}fl\'{e}chi~;
+la nouvelle balle part dans la direction \texttt{old\_delta},
+c'est-\`{a}-dire celle d'avant le rebond. Les deux sont
+int\'{e}gr\'{e}es au vecteur \texttt{balls} \`{a} l'it\'{e}ration
+suivante.
+
+\begin{center}
+\begin{minipage}[t]{0.75\textwidth}
+\begin{minipage}[t]{0.30\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/bb1.png}\\[1pt]
+{\small(a)}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.30\textwidth}
-\makebox[1.2em][l]{\small(a)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/rb1.png}%
-\\[2pt]
-\makebox[1.2em][l]{\small(b)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/rb2.png}%
-\\[2pt]
-\makebox[1.2em][l]{\small(c)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/rb3.png}
+\includegraphics[width=\linewidth]{photo_rapport_3/bb2.png}\\[1pt]
+{\small(b)}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.30\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/bb3.png}\\[1pt]
+{\small(c)}
 \end{minipage}
-
+\end{minipage}
+\end{center}
+\vspace{0.5cm}
 \medskip
-% --- Ligne 2 : BallBrick ---
-\noindent
-\begin{minipage}[t]{0.38\textwidth}
-\textbf{BallBrick} : d\'{e}truite d\`{e}s le premier impact.
-Une nouvelle balle est g\'{e}n\'{e}r\'{e}e au centre de la
-brique, h\'{e}ritant du delta incident de la balle frappante.
-\end{minipage}\hfill
-\begin{minipage}[t]{0.58\textwidth}
-\begin{minipage}[t]{0.30\linewidth}
-\centering
-\includegraphics[width=\linewidth]{photo_rapport_3/bb1.png}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.30\linewidth}
-\centering
-\includegraphics[width=\linewidth]{photo_rapport_3/bb2.png}
-\end{minipage}\\[2pt]
-\begin{minipage}[t]{0.30\linewidth}
-\centering
-\includegraphics[width=\linewidth]{photo_rapport_3/bb3.png}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.30\linewidth}
-\centering
-\includegraphics[width=\linewidth]{photo_rapport_3/bb4.png}
-\end{minipage}
-\end{minipage}
+% --- SplitBrick ---
+\textbf{SplitBrick} : (a)~brique intacte. (b)~\texttt{bounce\_brick()}
+appelle \texttt{hit()} sur la brique m\`{e}re~: la taille fille
+$s' = (\text{size} - \texttt{split\_brick\_gap})/2$ est calcul\'{e}e.
+Si $s' \geq \texttt{brick\_size\_min}$, quatre nouvelles
+\texttt{SplitBrick} sont instanci\'{e}es aux quatre quadrants
+et ajout\'{e}es via \texttt{bricks.push\_back()}.
+(c)~les filles int\`{e}grent la liste active et peuvent \`{a}
+leur tour se diviser~; si $s' < \texttt{brick\_size\_min}$, elles
+sont simplement d\'{e}truites \`{a} l'impact sans spawner.
 
-\medskip
-% --- Ligne 3 : SplitBrick ---
-\noindent
-\begin{minipage}[t]{0.38\textwidth}
-\textbf{SplitBrick} : d\'{e}truite au premier impact. Elle
-spawne 4 briques filles de taille
-$(\text{size} - \texttt{split\_brick\_gap})/2$,
-uniquement si cette taille $\geq$ \texttt{brick\_size\_min}.
+\begin{center}
+\begin{minipage}[t]{0.75\textwidth}
+\begin{minipage}[t]{0.30\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/sb1.png}\\[1pt]
+{\small(a)}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.58\textwidth}
-\makebox[1.2em][l]{\small(a)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/sb1.png}%
-\\[2pt]
-\makebox[1.2em][l]{\small(b)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/sb2.png}%
-\\[2pt]
-\makebox[1.2em][l]{\small(c)}%
-\includegraphics[width=0.91\linewidth]{photo_rapport_3/sb3.png}
+\begin{minipage}[t]{0.30\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/sb2.png}\\[1pt]
+{\small(b)}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.30\textwidth}
+\includegraphics[width=\linewidth]{photo_rapport_3/sb3.png}\\[1pt]
+{\small(c)}
 \end{minipage}
-
+\end{minipage}
+\end{center}
+\vspace{0.5cm}
 \newpage  % ← Force le passage à la page 2
 
 % ============================================================
