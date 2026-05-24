@@ -5,10 +5,10 @@
 
 #include <cmath>
 
-#include "graphic.h"
 #include "graphic_gui.h"
 #include "../tools/constants.h"
 #include "../tools/tools.h"
+#include "graphic.h"
 
 static const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
@@ -33,42 +33,17 @@ void set_color(Color color)
 
     switch (color)
     {
-    case RED:
-        r = 1.0;
-        break;
-    case ORANGE:
-        r = 1.0;
-        g = 0.5;
-        break;
-    case YELLOW:
-        r = 1.0;
-        g = 1.0;
-        break;
-    case GREEN:
-        g = 1.0;
-        break;
-    case CYAN:
-        g = 1.0;
-        b = 1.0;
-        break;
-    case BLUE:
-        b = 1.0;
-        break;
-    case PURPLE:
-        r = 0.5;
-        b = 1.0;
-        break;
-    case BLACK:
-        r = g = b = 0.0;
-        break;
-    case GREY:
-        r = g = b = 0.5;
-        break;
-    case WHITE:
-        r = g = b = 1.0;
-        break;
-    default:
-        break;
+    case RED:    r = 1.0;                break;
+    case ORANGE: r = 1.0; g = 0.5;       break;
+    case YELLOW: r = 1.0; g = 1.0;       break;
+    case GREEN:  g = 1.0;                break;
+    case CYAN:   g = 1.0; b = 1.0;       break;
+    case BLUE:   b = 1.0;                break;
+    case PURPLE: r = 0.5; b = 1.0;       break;
+    case BLACK:  r = g = b = 0.0;        break;
+    case GREY:   r = g = b = 0.5;        break;
+    case WHITE:  r = g = b = 1.0;        break;
+    default:                             break;
     }
     (*ptcr)->set_source_rgb(r, g, b);
 }

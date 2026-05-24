@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.29)  22 MAY 2026 19:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.29)  24 MAY 2026 12:48
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -566,7 +566,7 @@ Package pdftex.def Info: photo_rapport_3/sb3.png  used on input line 211.
 
  <./photo_rapport_3/B1.png (PNG copy)> <./photo_rapport_3/B2.png (PNG copy)> <./photo_rapport_3/B3.png (PNG copy)> <./photo_rapport_3/B4.png (PNG copy)> <./photo_rapport_3/rb1.png> <./photo_rapport_3/rb2.png> <./photo_rapport_3/rb3.png> <./photo_rapport_3/bb1.png> <./photo_rapport_3/bb2.png> <./photo_rapport_3/bb3.png> <./photo_rapport_3/sb1.png> <./photo_rapport_3/sb2.png> <./photo_rapport_3/sb3.png>]
 
-[2{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] (./rapport_rendu3.aux)
+[2] (./rapport_rendu3.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -575,18 +575,18 @@ Package rerunfilecheck Info: File `rapport_rendu3.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 16514 strings out of 473190
- 273089 string characters out of 5715800
+ 16520 strings out of 473190
+ 273108 string characters out of 5715800
  740530 words of memory out of 5000000
- 39495 multiletter control sequences out of 15000+600000
- 572789 words of font info for 98 fonts, out of 8000000 for 9000
+ 39489 multiletter control sequences out of 15000+600000
+ 572609 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,11n,79p,1095b,465s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on rapport_rendu3.pdf (2 pages, 247466 bytes).
+Output written on rapport_rendu3.pdf (2 pages, 239067 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 68 compressed objects within 1 object stream
+ 109 PDF objects out of 1000 (max. 8388607)
+ 65 compressed objects within 1 object stream
  13 named destinations out of 1000 (max. 500000)
- 34370 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 32322 words of extra memory for PDF output out of 35830 (max. 10000000)
 

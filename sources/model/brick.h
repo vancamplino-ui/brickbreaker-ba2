@@ -19,8 +19,8 @@ public:
     // constructeur de la brique
     Brick(Square body = {{0.0, 0.0}, 0.0}, BrickType type = RAINBOW);
 
-    Square getBody() const;
-    BrickType getType() const;
+    Square get_body() const;
+    BrickType get_type() const;
 
     // contrôle des données fournies en entrée
     bool is_inside_arena(double eps = 0) const;
@@ -41,7 +41,7 @@ public:
     // constructeur de la Rainbow brick
     RainbowBrick(Square body = {{0.0, 0.0}, 0.0}, int hit_points = 1);
 
-    int getHitPoints() const;
+    int get_hit_points() const;
 
     // vérifie que hit_points est bien dans [1, 7]
     bool is_hit_points_valid() const;

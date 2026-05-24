@@ -94,7 +94,7 @@ restent inchang\'{e}es. Les balles sont ensuite s\'{e}par\'{e}es
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
-\vspace{-15pt}
+\vspace{-8pt}
 \centering
 \begin{minipage}[t]{0.20\linewidth}
 \centering
@@ -225,10 +225,20 @@ sont simplement d\'{e}truites \`{a} l'impact sans spawner.
 % ------------------------------------------------------------
 
 \begin{itemize}[noitemsep, topsep=2pt]
-    \item \textbf{Liam Van Camp :} \textit{[Décrivez votre
-      contribution — modules, fonctions, tests, etc.]}
-    \item \textbf{Victor Eder :} \textit{[Décrivez sa contribution
-      — modules, fonctions, tests, etc.]}
+    \item \textbf{Liam Van Camp :} Restructuration complète de \texttt{game::update()} en
+      sous-fonctions (\texttt{move\_balls}, \texttt{move\_ball}, \texttt{move\_ball\_paddle},
+      \texttt{move\_balls\_paddle}). Implémentation de la physique balle-raquette
+      (\texttt{bounce\_paddle}, dépénétration) et balle-balle (\texttt{bounce\_ball},
+      \texttt{detect\_collisions}). Mise à jour de \texttt{game::update()} avec les trois
+      phases et les conditions de fin de partie. Mise à jour de \texttt{Paddle} avec
+      \texttt{last\_delta} et \texttt{get\_delta()}.
+    \item \textbf{Victor Henri Willy Eder :} Mise à jour de \texttt{Ball} avec
+      \texttt{translate()} et \texttt{set\_delta()}. Ajout de la méthode virtuelle pure
+      \texttt{hit()} dans la hiérarchie \texttt{Brick} avec implémentation pour
+      \texttt{RainbowBrick} (décrément \texttt{hit\_points}), \texttt{BallBrick} (génération
+      d'une nouvelle balle) et \texttt{SplitBrick} (division en 4 sous-briques). Vérification
+      des conventions de programmation sur l'ensemble du code. Mise à jour de \texttt{gui} et
+      \texttt{game} pour l'affichage des messages de fin de partie.
 \end{itemize}
 
 % ------------------------------------------------------------
@@ -236,54 +246,71 @@ sont simplement d\'{e}truites \`{a} l'impact sans spawner.
 % ------------------------------------------------------------
 
 \textbf{Organisation et outils :}
-\textit{[Décrivez comment vous vous êtes organisés — Git (branches,
-commits), VSCode Live Share, réunions, etc.]}
+Même méthode que les rendus précédents, avec Git partagé et communication via Discord et
+WhatsApp. Le Rendu 3 a nécessité plus de coordination que les rendus précédents car les
+modules étaient fortement liés --- notamment \texttt{Ball}, \texttt{Brick}, \texttt{Paddle}
+et \texttt{Game} qui devaient évoluer simultanément.
 
 \textbf{Ordre de développement et tests :}
-\textit{[Dans quel ordre avez-vous développé les modules ? Ex :
-tools → ball/brick/paddle → game::load → game::update. Quelles
-méthodes de test pour chaque partie (fichiers .txt manuels,
-débogage visuel, etc.) ?]}
+Nous avons commencé par définir la structure globale de \texttt{game::update()} avant d'en
+implémenter le détail. Nous avons ensuite rendu \texttt{Ball} et \texttt{Paddle} mutables, puis ajouté
+\texttt{hit()} aux briques, avant de compléter \texttt{game::update()}. Chaque étape a été
+testée visuellement dans l'interface graphique, notamment grâce au mode pas-à-pas (bouton
+\textit{Step}) qui permet d'avancer image par image et d'observer précisément le comportement
+des entités. De plus des fichier test spécifiques ont été créés pour valider les nouvelles fonctionnalités une fois implémentées.
 
 \textbf{Travail simultané vs indépendant :}
-\textit{[Quelle proportion du code a été écrite côte à côte (pair
-programming) vs en parallèle de façon indépendante ? Avec le
-recul, changeriez-vous cette proportion, et pourquoi ?]}
+Une moitié du travail a été réalisée de manière simultanée et coordonnée, l'autre moitié de
+manière indépendante. Avec le recul, cette proportion était bien adaptée au Rendu 3 car les
+dépendances entre modules nécessitaient une communication constante, contrairement aux
+Rendus 1 et 2 où les modules étaient plus indépendants.
 
 % ------------------------------------------------------------
 \subsection*{2.3 Bug le plus fréquent}
 % ------------------------------------------------------------
 
-\textit{[Décrivez le bug qui revenait le plus souvent — ex : balle
-traversant les briques (effet tunnel), boucle infinie dans
-update(), mauvaise direction nominale, etc. Quelle était la cause,
-comment l'avez-vous détecté et résolu ?]}
+Le bug le plus fréquent provenait d'un mauvais ordre d'appel des fonctions dans
+\texttt{update()}~: déplacer une balle avant ou après le calcul de collision changeait
+complètement le résultat. Le cas le plus récurrent concernait le rebond sur la raquette~:
+la balle la traversait ou rebondissait dans la mauvaise direction car le déplacement était
+appliqué avant la dépénétration, plaçant la balle de l'autre côté au moment du calcul. La
+correction a consisté à toujours effectuer la dépénétration avant la mise à jour de la
+position, et à s'assurer que \texttt{get\_delta()} de la raquette était appelé au bon moment.
 
 % ------------------------------------------------------------
 \subsection*{2.4 Usage d'un outil d'IA}
 % ------------------------------------------------------------
 
-\textit{[Avez-vous utilisé un outil d'IA (Claude, ChatGPT,
-Copilot, etc.) ? Si oui, pour quelles tâches (compréhension des
-formules de collision, débogage, structuration du rapport, etc.) ?
-Gain ou perte de temps — quantifiez approximativement (ex :
-``gain d'environ 1h sur la compréhension de la formule
-d'impulsion balle-balle'').]}
+Nous avons utilisé Claude (Anthropic) tout au long du projet, principalement pour contrôler
+le code écrit et corriger les erreurs plus rapidement. Cette approche s'est avérée efficace,
+mais nécessitait une vérification systématique~: faute de vision globale du projet, l'outil
+introduisait parfois de nouvelles erreurs ailleurs en corrigeant un point précis. Il a
+également été utilisé pour implémenter certaines parties spécifiques, comme les calculs
+d'impulsion entre balles ou la lecture de fichiers selon les conventions vues en série
+d'exercices. Dans ces cas, il était impératif de fournir une structure claire en amont. Enfin, l'IA a été
+utilisée pour la mise en forme et la formulation des rapports. En résumé, le gain de temps était clairement visible pour la détection et la correction
+d'erreurs. Néanmoins le temps gagné à la
+génération était en partie compensé par le travail de structuration préalable
+indispensable.
 
 % ------------------------------------------------------------
 \subsection*{2.5 Conclusion}
 % ------------------------------------------------------------
 
-\textit{[Auto-évaluation courte sur deux axes :]}
+\textbf{Code :} Certains comportements propres à \texttt{Ball} ou \texttt{Brick} sont
+gérés depuis \texttt{Game} alors qu'ils auraient pu résider directement dans ces classes.
+Nous le faisons déjà en partie --- \texttt{hit()} dans \texttt{Brick}, \texttt{translate()}
+et \texttt{set\_delta()} dans \texttt{Ball} --- mais la démarche aurait pu être poussée plus
+loin pour alléger \texttt{Game}. En revanche, la séparation de \texttt{update()} en
+sous-fonctions bien délimitées (\texttt{bounce\_brick}, \texttt{bounce\_ball},
+\texttt{detect\_collisions}, etc.) s'est avérée un vrai atout~: le code est lisible,
+chaque comportement est isolé et les modifications restent locales.
 
-\textbf{Code :} \textit{[Robustesse (gestion des cas limites,
-boucles infinies évitées via nb\_bounce\_max, etc.) et performance
-(complexité des boucles dans update(), etc.)]}
-
-\textbf{Environnement de travail :} \textit{[Points forts et
-points faibles de l'environnement fourni (GTKmm, structure
-imposée, fichiers de test, etc.) et améliorations que vous
-suggéreriez.]}
+\textbf{Environnement de travail :} GitHub a été très utile, même s'il a fallu un temps
+d'adaptation initial. De plus, certaines séries d'exercices ont beaucoup aidé, mais une proportion
+trop grande de code y était détaillée par rapport à ce qui était couvert en cours. La
+structure de modularisation imposée était difficile à visualiser au départ, mais elle s'est
+révélée indispensable et a grandement facilité le travail par la suite.
 
 % ============================================================
 \end{document}

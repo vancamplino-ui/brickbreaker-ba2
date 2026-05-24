@@ -15,11 +15,11 @@ public:
     // constructeur de la balle
     Ball(Circle body = {{0.0, 0.0}, 0.0}, Point delta = {0.0, 0.0});
 
-    Circle getBody() const;
-    Point getDelta() const;
+    Circle get_body() const;
+    Point get_delta() const;
 
     void translate(Point d);
-    void setDelta(Point new_delta);
+    void set_delta(Point new_delta);
 
     // contrôle des données fournies en entrée
     bool is_inside_arena(double eps = 0) const;

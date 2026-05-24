@@ -12,12 +12,12 @@ Brick::Brick(Square body, BrickType type)
 {
 }
 
-Square Brick::getBody() const
+Square Brick::get_body() const
 {
     return body;
 }
 
-BrickType Brick::getType() const
+BrickType Brick::get_type() const
 {
     return type;
 }
@@ -56,7 +56,7 @@ RainbowBrick::RainbowBrick(Square body, int hit_points)
 {
 }
 
-int RainbowBrick::getHitPoints() const
+int RainbowBrick::get_hit_points() const
 {
     return hit_points;
 }

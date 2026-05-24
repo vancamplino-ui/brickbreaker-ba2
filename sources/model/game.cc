@@ -10,10 +10,10 @@
 #include <string>
 #include <utility>
 
-#include "game.h"
 #include "message.h"
 #include "../tools/tools.h"
 #include "../tools/constants.h"
+#include "game.h"
 
 namespace
 {
@@ -45,11 +45,6 @@ namespace
     void write_balls(std::ofstream& file, std::vector<Ball> const& balls);
 
     // --- physique du jeu ---
-    void detect_collisions(Circle body, Ball const& ball,
-                           std::vector<Ball> const& balls,
-                           std::vector<Brick*> const& bricks,
-                           std::set<size_t> const& bounced,
-                           int& brick_idx, int& ball_idx);
     void bounce_brick(Ball& ball, int brick_idx,
                       std::vector<Brick*>& bricks,
                       std::vector<Ball>& new_balls,
@@ -60,6 +55,11 @@ namespace
     void bounce_paddle(Ball& ball, Paddle const& paddle);
     void bounce_arena(Ball& ball, Circle body,
                       bool hit_left, bool hit_right, bool hit_top);
+    void detect_collisions(Circle body, Ball const& ball,
+                           std::vector<Ball> const& balls,
+                           std::vector<Brick*> const& bricks,
+                           std::set<size_t> const& bounced,
+                           int& brick_idx, int& ball_idx);
     void resolve_bounces(Ball& ball, Point old_pos,
                          std::vector<Ball>& balls,
                          std::vector<Brick*>& bricks,
@@ -109,7 +109,7 @@ bool Game::bricks_intersect()
 {
     for (size_t i = 0; i < bricks.size(); ++i) {
         for (size_t j = i + 1; j < bricks.size(); ++j) {
-            if (::intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
+            if (::intersects(bricks[i]->get_body(), bricks[j]->get_body())) {
                 std::cout << message::collision_bricks(i, j);
                 return true;
             }
@@ -124,7 +124,7 @@ bool Game::paddle_intersects_brick(Paddle const* tested_paddle) const
     if (tested_paddle != nullptr) paddle_to_test = tested_paddle;
 
     for (size_t i = 0; i < bricks.size(); ++i) {
-        if (::intersects(paddle_to_test->getArc(), bricks[i]->getBody())) {
+        if (::intersects(paddle_to_test->get_arc(), bricks[i]->get_body())) {
             if (tested_paddle == nullptr) {
                 std::cout << message::collision_paddle_brick(i);
             }
@@ -138,7 +138,7 @@ bool Game::balls_intersect()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = i + 1; j < balls.size(); ++j) {
-            if (::intersects(balls[i].getBody(), balls[j].getBody())) {
+            if (::intersects(balls[i].get_body(), balls[j].get_body())) {
                 std::cout << message::collision_balls(i, j);
                 return true;
             }
@@ -151,7 +151,7 @@ bool Game::ball_intersects_brick()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = 0; j < bricks.size(); ++j) {
-            if (::intersects(balls[i].getBody(), bricks[j]->getBody())) {
+            if (::intersects(balls[i].get_body(), bricks[j]->get_body())) {
                 std::cout << message::collision_ball_brick(i, j);
                 return true;
             }
@@ -163,7 +163,7 @@ bool Game::ball_intersects_brick()
 bool Game::paddle_intersects_ball()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
-        if (::intersects(paddle.getArc(), balls[i].getBody())) {
+        if (::intersects(paddle.get_arc(), balls[i].get_body())) {
             std::cout << message::collision_paddle_ball(i);
             return true;
         }
@@ -272,7 +272,7 @@ void Game::set_paddle_target(double x)
 
 void Game::move_paddle_to(double x)
 {
-    double current_x = paddle.getArc().center.x;
+    double current_x = paddle.get_arc().center.x;
     double dx = x - current_x;
     double new_x = x;
 
@@ -291,8 +291,8 @@ void Game::move_paddle_to(double x)
 
 void Game::add_ball_on_paddle()
 {
-    double top_x = paddle.getArc().center.x;
-    double top_y = paddle.getArc().center.y + paddle.getArc().radius;
+    double top_x = paddle.get_arc().center.x;
+    double top_y = paddle.get_arc().center.y + paddle.get_arc().radius;
     balls.push_back(Ball({{top_x, top_y + new_ball_radius + epsil_zero},
                            new_ball_radius},
                          {0.0, new_ball_delta_norm}));
@@ -559,7 +559,7 @@ namespace
 
     void write_paddle(std::ofstream& file, Paddle const& paddle)
     {
-        Circle paddle_arc = paddle.getArc();
+        Circle paddle_arc = paddle.get_arc();
 
         file << "# paddle\n";
         file << paddle_arc.center.x << ' '
@@ -573,20 +573,20 @@ namespace
         file << bricks.size() << '\n';
 
         for (Brick const* brick : bricks) {
-            Square body = brick->getBody();
+            Square body = brick->get_body();
             double size = 2.0 * body.half_size;
 
-            file << brick->getType() << ' '
+            file << brick->get_type() << ' '
                  << body.center.x << ' '
                  << body.center.y << ' '
                  << size;
 
-            if (brick->getType() == RAINBOW) {
+            if (brick->get_type() == RAINBOW) {
                 RainbowBrick const* rainbow =
                     dynamic_cast<RainbowBrick const*>(brick);
 
                 if (rainbow != nullptr) {
-                    file << ' ' << rainbow->getHitPoints();
+                    file << ' ' << rainbow->get_hit_points();
                 }
             }
 
@@ -600,8 +600,8 @@ namespace
         file << balls.size() << '\n';
 
         for (Ball const& ball : balls) {
-            Circle body = ball.getBody();
-            Point delta = ball.getDelta();
+            Circle body = ball.get_body();
+            Point delta = ball.get_delta();
 
             file << body.center.x << ' '
                  << body.center.y << ' '
@@ -618,8 +618,8 @@ namespace
                       std::vector<Ball>& new_balls,
                       int& score)
     {
-        Square sq = bricks[brick_idx]->getBody();
-        Point diff = sq.center - ball.getBody().center;
+        Square sq = bricks[brick_idx]->get_body();
+        Point diff = sq.center - ball.get_body().center;
         Point diff_borne = {
             std::clamp(diff.x, -sq.half_size, sq.half_size),
             std::clamp(diff.y, -sq.half_size, sq.half_size)
@@ -635,11 +635,11 @@ namespace
             else
                 n.y = (diff.y > 0) ? 1.0 : -1.0;
         }
-        double v_n = dot(ball.getDelta(), n);
-        Point old_delta = ball.getDelta();
-        ball.setDelta(old_delta - n * (2.0 * v_n));
-        BrickType brick_type = bricks[brick_idx]->getType();
-        Point brick_center   = bricks[brick_idx]->getBody().center;
+        double v_n = dot(ball.get_delta(), n);
+        Point old_delta = ball.get_delta();
+        ball.set_delta(old_delta - n * (2.0 * v_n));
+        BrickType brick_type = bricks[brick_idx]->get_type();
+        Point brick_center   = bricks[brick_idx]->get_body().center;
         std::vector<Brick*> new_bricks;
         bool destroyed = bricks[brick_idx]->hit(new_bricks);
         score += score_per_hit;
@@ -657,40 +657,40 @@ namespace
                      std::vector<Ball>& balls,
                      std::set<size_t>& bounced)
     {
-        Circle cj   = balls[ball_idx].getBody();
+        Circle cj   = balls[ball_idx].get_body();
         Point axis  = normalized(cj.center - body.center);
-        double v_n  = dot(ball.getDelta(), axis);
-        double v_nj = dot(balls[ball_idx].getDelta(), axis);
+        double v_n  = dot(ball.get_delta(), axis);
+        double v_nj = dot(balls[ball_idx].get_delta(), axis);
         double ri   = body.radius;
         double rj   = cj.radius;
 
         double fi = 2.0 * rj * rj / (ri * ri + rj * rj);
-        Point new_di = ball.getDelta() + axis * ((-v_n + v_nj) * fi);
+        Point new_di = ball.get_delta() + axis * ((-v_n + v_nj) * fi);
         double ni = norm(new_di);
         if (ni > delta_norm_max) new_di = new_di * (delta_norm_max / ni);
-        ball.setDelta(new_di);
+        ball.set_delta(new_di);
 
         double fj = 2.0 * ri * ri / (ri * ri + rj * rj);
-        Point new_dj = balls[ball_idx].getDelta() + axis * ((v_n - v_nj) * fj);
+        Point new_dj = balls[ball_idx].get_delta() + axis * ((v_n - v_nj) * fj);
         double nj = norm(new_dj);
         if (nj > delta_norm_max) new_dj = new_dj * (delta_norm_max / nj);
-        balls[ball_idx].setDelta(new_dj);
+        balls[ball_idx].set_delta(new_dj);
 
         bounced.insert(static_cast<size_t>(ball_idx));
     }
 
     void bounce_paddle(Ball& ball, Paddle const& paddle)
     {
-        Circle ball_body  = ball.getBody();
-        Circle paddle_arc = paddle.getArc();
+        Circle ball_body  = ball.get_body();
+        Circle paddle_arc = paddle.get_arc();
         Point axis  = normalized(ball_body.center - paddle_arc.center);
-        double v_n  = dot(ball.getDelta(), axis);
-        double v_nj = dot(paddle.getDelta(), axis);
-        Point new_delta = ball.getDelta() + axis * ((-v_n + v_nj) * 2.0);
+        double v_n  = dot(ball.get_delta(), axis);
+        double v_nj = dot(paddle.get_delta(), axis);
+        Point new_delta = ball.get_delta() + axis * ((-v_n + v_nj) * 2.0);
         if (new_delta.y < 0.0) new_delta.y = -new_delta.y;
         double n = norm(new_delta);
         if (n > delta_norm_max) new_delta = new_delta * (delta_norm_max / n);
-        ball.setDelta(new_delta);
+        ball.set_delta(new_delta);
     }
 
     void bounce_arena(Ball& ball, Circle body,
@@ -704,10 +704,10 @@ namespace
             if (dist_x > dist_y) hit_top = false;
             else { hit_left = false; hit_right = false; }
         }
-        Point delta = ball.getDelta();
+        Point delta = ball.get_delta();
         if (hit_left || hit_right) delta.x = -delta.x;
         if (hit_top)               delta.y = -delta.y;
-        ball.setDelta(delta);
+        ball.set_delta(delta);
     }
 
     void detect_collisions(Circle body, Ball const& ball,
@@ -718,7 +718,7 @@ namespace
     {
         brick_idx = -1;
         for (size_t j = 0; j < bricks.size(); ++j)
-            if (intersects(body, bricks[j]->getBody(), epsil_zero)) {
+            if (intersects(body, bricks[j]->get_body(), epsil_zero)) {
                 brick_idx = static_cast<int>(j);
                 break;
             }
@@ -727,7 +727,7 @@ namespace
         for (size_t j = 0; j < balls.size(); ++j) {
             if (&balls[j] == &ball) continue;
             if (bounced.count(j)) continue;  // déjà mis à jour symétriquement
-            if (intersects(body, balls[j].getBody(), epsil_zero)) {
+            if (intersects(body, balls[j].get_body(), epsil_zero)) {
                 ball_idx = static_cast<int>(j);
                 break;
             }
@@ -747,12 +747,12 @@ namespace
         bool paddle_bounced = false;
 
         while (nb_rebonds < nb_bounce_max) {
-            Circle body = ball.getBody();
+            Circle body = ball.get_body();
             bool hit_left   = (body.center.x - body.radius < epsil_zero);
             bool hit_right  = (body.center.x + body.radius > arena_size - epsil_zero);
             bool hit_top    = (body.center.y + body.radius > arena_size - epsil_zero);
             bool hit_paddle = !paddle_bounced
-                              && intersects(paddle.getArc(), body, epsil_zero);
+                              && intersects(paddle.get_arc(), body, epsil_zero);
             int brick_idx = -1;
             int ball_idx  = -1;
             detect_collisions(body, ball, balls, bricks, bounced, brick_idx, ball_idx);
@@ -760,7 +760,7 @@ namespace
             if (!hit_left && !hit_right && !hit_top && !hit_paddle
                 && brick_idx < 0 && ball_idx < 0) break;
 
-            ball.translate(old_pos - ball.getBody().center);
+            ball.translate(old_pos - ball.get_body().center);
             ++nb_rebonds;
 
             if (brick_idx >= 0)
@@ -773,8 +773,8 @@ namespace
             } else
                 bounce_arena(ball, body, hit_left, hit_right, hit_top);
 
-            old_pos = ball.getBody().center;
-            ball.translate(ball.getDelta());
+            old_pos = ball.get_body().center;
+            ball.translate(ball.get_delta());
         }
     }
 
@@ -788,9 +788,9 @@ namespace
                    std::set<size_t>& bounced,
                    int& score)
     {
-        Point old_pos = ball.getBody().center;
-        ball.translate(ball.getDelta());
-        if (ball.getBody().center.y < 0.0)
+        Point old_pos = ball.get_body().center;
+        ball.translate(ball.get_delta());
+        if (ball.get_body().center.y < 0.0)
             return true;
 
         resolve_bounces(ball, old_pos, balls, bricks,
@@ -828,7 +828,7 @@ namespace
                           Paddle const& paddle,
                           int& score)
     {
-        if (!intersects(paddle.getArc(), ball.getBody(), epsil_zero))
+        if (!intersects(paddle.get_arc(), ball.get_body(), epsil_zero))
             return;
 
         bounce_paddle(ball, paddle);  // pas compté dans nb_rebonds
@@ -836,8 +836,8 @@ namespace
         // Dépénétration : sortir la balle hors de la zone eps du paddle
         // pour éviter qu'un 2e rebond paddle s'enclenche dans resolve_bounces.
         {
-            Circle bd    = ball.getBody();
-            Circle pa    = paddle.getArc();
+            Circle bd    = ball.get_body();
+            Circle pa    = paddle.get_arc();
             double d     = distance(bd.center, pa.center);
             double limit = bd.radius + pa.radius + epsil_zero;
             if (d < limit) {
@@ -847,9 +847,9 @@ namespace
             }
         }
 
-        ball.translate(ball.getDelta());
+        Point old_pos = ball.get_body().center;
+        ball.translate(ball.get_delta());
 
-        Point old_pos = ball.getBody().center;
         std::set<size_t> bounced;
         resolve_bounces(ball, old_pos, balls, bricks,
                         new_balls, paddle, bounced, score);

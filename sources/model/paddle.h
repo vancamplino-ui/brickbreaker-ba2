@@ -14,10 +14,10 @@ class Paddle
 public:
     // constructeur de la raquette.
     Paddle(Point center = {0.0, 0.0}, double radius = 0.0);
-    Circle getArc() const;
+    Circle get_arc() const;
     double get_target_mouse() const;
     void set_target_mouse(double x);
-    Point getDelta() const;
+    Point get_delta() const;
 
     // contrôle des données fournies en entrée
     bool is_y_valid(double eps = 0) const;

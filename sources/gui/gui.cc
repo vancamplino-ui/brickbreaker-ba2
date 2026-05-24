@@ -10,8 +10,8 @@
 #include "constants.h"
 #include "graphic.h"
 #include "graphic_gui.h"
-#include "gui.h"
 #include "message.h"
+#include "gui.h"
 
 using namespace std;
 
@@ -377,36 +377,30 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     draw_background();
     draw_arena_border();
 
-    for (Brick const* brick : game.get_bricks())
-    {
-        if (brick == nullptr) continue;
-
-        switch (brick->getType())
-        {
-        case RAINBOW:
-            draw_rainbow_brick(brick->getBody(),
-                              static_cast<RainbowBrick const*>(brick)->getHitPoints());
-            break;
-
-        case BALL:
-            draw_ball_brick(brick->getBody());
-            break;
-
-        case SPLIT:
-            draw_split_brick(brick->getBody());
-            break;
-
-        default:
-            break;
-        }
-    }
+    draw_bricks();
 
     for (Ball const& ball : game.get_balls())
-    {
-        draw_ball(ball.getBody());
-    }
+        draw_ball(ball.get_body());
 
-    draw_paddle(game.get_paddle().getArc());
+    draw_paddle(game.get_paddle().get_arc());
+}
+
+void My_window::draw_bricks()
+{
+    for (Brick const* brick : game.get_bricks()) {
+        if (brick == nullptr) continue;
+
+        switch (brick->get_type())
+        {
+        case RAINBOW:
+            draw_rainbow_brick(brick->get_body(),
+                static_cast<RainbowBrick const*>(brick)->get_hit_points());
+            break;
+        case BALL:   draw_ball_brick(brick->get_body());  break;
+        case SPLIT:  draw_split_brick(brick->get_body()); break;
+        default:                                           break;
+        }
+    }
 }
 
 void My_window::set_mouse_controller()
@@ -426,6 +420,7 @@ void My_window::set_mouse_controller()
 
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
+    if (!arena_visible || game.is_finished()) return;
     if (game.get_balls().empty() && game.get_lives() > 0) {
         game.add_ball_on_paddle();
         update_infos();
@@ -435,12 +430,12 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    //convertion des coordonnées de la fenêtre aux coordonnées de l'arène
+    // conversion des coordonnées de la fenêtre aux coordonnées de l'arène
     double width = drawing.get_width();
     double height = drawing.get_height();
     double side = min(width, height);
 
-    //prise en compte uniquement de la partie drawing et consacré a l'arrène
+    // seule la zone carrée du canvas est utilisée pour l'arène
     double arena_x = (x - (width - side) / 2.0) * arena_size / side;
 
     game.set_paddle_target(arena_x);

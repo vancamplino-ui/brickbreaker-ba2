@@ -12,7 +12,7 @@ Paddle::Paddle(Point center, double radius)
 {
 }
 
-Circle Paddle::getArc() const
+Circle Paddle::get_arc() const
 {
     return arc;
 }
@@ -73,7 +73,7 @@ void Paddle::move_to(double x)
     arc.center.x = x;
 }
 
-Point Paddle::getDelta() const
+Point Paddle::get_delta() const
 {
     return last_delta;
 }

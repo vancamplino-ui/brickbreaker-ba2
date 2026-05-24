@@ -10,12 +10,12 @@ Ball::Ball(Circle body, Point delta)
 {
 }
 
-Circle Ball::getBody() const
+Circle Ball::get_body() const
 {
     return body;
 }
 
-Point Ball::getDelta() const
+Point Ball::get_delta() const
 {
     return delta;
 }
@@ -55,7 +55,7 @@ void Ball::translate(Point d)
     body.center = body.center + d;
 }
 
-void Ball::setDelta(Point new_delta)
+void Ball::set_delta(Point new_delta)
 {
     delta = new_delta;
 }
