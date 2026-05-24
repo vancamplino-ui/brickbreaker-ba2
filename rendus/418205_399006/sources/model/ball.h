@@ -1,7 +1,7 @@
 // ball.h  : declaration de la classe Ball
 //
 // Auteur   : Victor Henri Willy Eder
-// Version  : 1.0 du 24.05.2026
+// Version  : 1.0 du 26.04.2026
 
 #ifndef BALL_H
 #define BALL_H
@@ -15,11 +15,8 @@ public:
     // constructeur de la balle
     Ball(Circle body = {{0.0, 0.0}, 0.0}, Point delta = {0.0, 0.0});
 
-    Circle get_body() const;
-    Point get_delta() const;
-
-    void translate(Point d);
-    void set_delta(Point new_delta);
+    Circle getBody() const;
+    Point getDelta() const;
 
     // contrôle des données fournies en entrée
     bool is_inside_arena(double eps = 0) const;

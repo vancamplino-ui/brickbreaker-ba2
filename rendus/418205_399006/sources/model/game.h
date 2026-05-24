@@ -1,7 +1,7 @@
 // game.h  : declaration de la classe Game
 //
 // Auteurs  : Liam Van Camp, Victor Henri Willy Eder
-// Version  : 1.0 du 24.05.2026
+// Version  : 1.0 du 26.04.2026
 
 #ifndef GAME_H
 #define GAME_H

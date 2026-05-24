@@ -1,7 +1,7 @@
 // graphic_gui.h : interface pour initialiser le contexte Cairo
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 24.05.2026
+// Version : 1.0 du 26.04.2026
 
 #ifndef GRAPHIC_GUI_H
 #define GRAPHIC_GUI_H

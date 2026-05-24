@@ -248,7 +248,7 @@ sont simplement d\'{e}truites \`{a} l'impact sans spawner.
 \textbf{Organisation et outils :}
 Même méthode que les rendus précédents, avec Git partagé et communication via Discord et
 WhatsApp. Le Rendu 3 a nécessité plus de coordination que les rendus précédents car les
-modules étaient fortement liés --- notamment \texttt{Ball}, \texttt{Brick}, \texttt{Paddle}
+modules étaient fortement liés notamment \texttt{Ball}, \texttt{Brick}, \texttt{Paddle}
 et \texttt{Game} qui devaient évoluer simultanément.
 
 \textbf{Ordre de développement et tests :}
@@ -299,8 +299,8 @@ indispensable.
 
 \textbf{Code :} Certains comportements propres à \texttt{Ball} ou \texttt{Brick} sont
 gérés depuis \texttt{Game} alors qu'ils auraient pu résider directement dans ces classes.
-Nous le faisons déjà en partie --- \texttt{hit()} dans \texttt{Brick}, \texttt{translate()}
-et \texttt{set\_delta()} dans \texttt{Ball} --- mais la démarche aurait pu être poussée plus
+Nous le faisons déjà en partie \texttt{hit()} dans \texttt{Brick}, \texttt{translate()}
+et \texttt{set\_delta()} dans \texttt{Ball} mais la démarche aurait pu être poussée plus
 loin pour alléger \texttt{Game}. En revanche, la séparation de \texttt{update()} en
 sous-fonctions bien délimitées (\texttt{bounce\_brick}, \texttt{bounce\_ball},
 \texttt{detect\_collisions}, etc.) s'est avérée un vrai atout~: le code est lisible,

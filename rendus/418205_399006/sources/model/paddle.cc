@@ -1,7 +1,7 @@
 // paddle.cc  : definition des methodes de la classe Paddle
 //
 // Auteur   : Liam Van Camp
-// Version  : 1.0 du 24.05.2026
+// Version  : 1.0 du 26.04.2026
 
 #include <cmath>
 
@@ -12,7 +12,7 @@ Paddle::Paddle(Point center, double radius)
 {
 }
 
-Circle Paddle::get_arc() const
+Circle Paddle::getArc() const
 {
     return arc;
 }
@@ -69,11 +69,5 @@ bool Paddle::is_valid(double eps) const
 
 void Paddle::move_to(double x)
 {
-    last_delta = {x - arc.center.x, 0.0};
     arc.center.x = x;
-}
-
-Point Paddle::get_delta() const
-{
-    return last_delta;
 }

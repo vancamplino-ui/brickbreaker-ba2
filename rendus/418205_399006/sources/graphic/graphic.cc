@@ -1,21 +1,21 @@
 // graphic.cc : dessin des entités du jeu via Cairo
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 24.05.2026
+// Version : 1.0 du 26.04.2026
 
 #include <cmath>
 
+#include "graphic.h"
 #include "graphic_gui.h"
 #include "../tools/constants.h"
 #include "../tools/tools.h"
-#include "graphic.h"
 
 static const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
 namespace
 {
-    constexpr double TWO_PI = 6.28318530717958647692;
-    constexpr double PI = 3.14159265358979323846;
+    constexpr double two_pi = 6.28318530717958647692;
+    constexpr double pi = 3.14159265358979323846;
     Color rainbow_color_from_hit_points(int hit_points);
     void fill_square(Square const& square);
     void fill_circle(Circle const& circle);
@@ -33,17 +33,42 @@ void set_color(Color color)
 
     switch (color)
     {
-    case RED:    r = 1.0;                break;
-    case ORANGE: r = 1.0; g = 0.5;       break;
-    case YELLOW: r = 1.0; g = 1.0;       break;
-    case GREEN:  g = 1.0;                break;
-    case CYAN:   g = 1.0; b = 1.0;       break;
-    case BLUE:   b = 1.0;                break;
-    case PURPLE: r = 0.5; b = 1.0;       break;
-    case BLACK:  r = g = b = 0.0;        break;
-    case GREY:   r = g = b = 0.5;        break;
-    case WHITE:  r = g = b = 1.0;        break;
-    default:                             break;
+    case RED:
+        r = 1.0;
+        break;
+    case ORANGE:
+        r = 1.0;
+        g = 0.5;
+        break;
+    case YELLOW:
+        r = 1.0;
+        g = 1.0;
+        break;
+    case GREEN:
+        g = 1.0;
+        break;
+    case CYAN:
+        g = 1.0;
+        b = 1.0;
+        break;
+    case BLUE:
+        b = 1.0;
+        break;
+    case PURPLE:
+        r = 0.5;
+        b = 1.0;
+        break;
+    case BLACK:
+        r = g = b = 0.0;
+        break;
+    case GREY:
+        r = g = b = 0.5;
+        break;
+    case WHITE:
+        r = g = b = 1.0;
+        break;
+    default:
+        break;
     }
     (*ptcr)->set_source_rgb(r, g, b);
 }
@@ -119,7 +144,7 @@ void draw_paddle(Circle const& arc)
     //sin(t) = -y / r
     const double ratio(-arc.center.y / arc.radius);
     const double start_angle(std::asin(ratio));
-    const double end_angle(PI - start_angle);
+    const double end_angle(pi - start_angle);
 
     set_color(BLACK);
     (*ptcr)->set_line_width(1.0);
@@ -158,7 +183,7 @@ namespace
                      circle.center.y,
                      circle.radius,
                      0.0,
-                     TWO_PI);
+                     two_pi);
         (*ptcr)->fill();
     }
 

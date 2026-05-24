@@ -1,8 +1,8 @@
 // message.cc  : fonctions pour l'affichage des messages d'erreur et des messages
 //               d'etat du jeu
 //
-// Auteur   : EPFL
-// Version  : 1.0 du 24.05.2026
+// Auteur   : Liam Van Camp
+// Version  : 1.0 du 26.04.2026
 
 #include "message.h"
 

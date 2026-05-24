@@ -1,7 +1,7 @@
 // gui.cc : gestion de l'interface graphique GTKmm
 //
 // Auteurs : Liam Van Camp, Victor Henri Willy Eder
-// Version : 1.0 du 24.05.2026
+// Version : 1.0 du 26.04.2026
 
 #include <algorithm>
 #include <filesystem>
@@ -10,7 +10,6 @@
 #include "constants.h"
 #include "graphic.h"
 #include "graphic_gui.h"
-#include "message.h"
 #include "gui.h"
 
 using namespace std;
@@ -66,10 +65,6 @@ My_window::My_window(string file_name)
         }
     }
 
-    buttons[SAVE].set_sensitive(arena_visible);
-    buttons[RESTART].set_sensitive(arena_visible);
-    buttons[START].set_sensitive(arena_visible && !game.is_finished());
-    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
 }
@@ -124,10 +119,6 @@ void My_window::restart_clicked()
         arena_visible = false;
     }
 
-    buttons[SAVE].set_sensitive(arena_visible);
-    buttons[RESTART].set_sensitive(arena_visible);
-    buttons[START].set_sensitive(arena_visible && !game.is_finished());
-    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
 }
@@ -162,16 +153,13 @@ void My_window::start_clicked()
         buttons[START].set_label("start");
 
     }
+
 }
 void My_window::step_clicked()
 {
     game.update();
     update_infos();
     drawing.queue_draw();
-    if (game.is_finished()) {
-        buttons[STEP].set_sensitive(false);
-        buttons[START].set_sensitive(false);
-    }
 }
 void My_window::set_key_controller()
 {
@@ -248,10 +236,6 @@ void My_window::handle_open_file(std::filesystem::path const& file_name,
         arena_visible = false;
     }
 
-    buttons[SAVE].set_sensitive(arena_visible);
-    buttons[RESTART].set_sensitive(arena_visible);
-    buttons[START].set_sensitive(arena_visible && !game.is_finished());
-    buttons[STEP].set_sensitive(arena_visible && !game.is_finished());
     update_infos();
     drawing.queue_draw();
     dialog->hide();
@@ -312,8 +296,6 @@ bool My_window::loop()
 
     if (game.is_finished()) {
         stop_loop();
-        buttons[STEP].set_sensitive(false);
-        buttons[START].set_sensitive(false);
         return false;
     }
 
@@ -323,8 +305,6 @@ bool My_window::loop()
 
     if (game.is_finished()) {
         stop_loop();
-        buttons[STEP].set_sensitive(false);
-        buttons[START].set_sensitive(false);
         return false;
     }
 
@@ -377,30 +357,36 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     draw_background();
     draw_arena_border();
 
-    draw_bricks();
-
-    for (Ball const& ball : game.get_balls())
-        draw_ball(ball.get_body());
-
-    draw_paddle(game.get_paddle().get_arc());
-}
-
-void My_window::draw_bricks()
-{
-    for (Brick const* brick : game.get_bricks()) {
+    for (Brick const* brick : game.get_bricks())
+    {
         if (brick == nullptr) continue;
 
-        switch (brick->get_type())
+        switch (brick->getType())
         {
         case RAINBOW:
-            draw_rainbow_brick(brick->get_body(),
-                static_cast<RainbowBrick const*>(brick)->get_hit_points());
+            draw_rainbow_brick(brick->getBody(),
+                              static_cast<RainbowBrick const*>(brick)->getHitPoints());
             break;
-        case BALL:   draw_ball_brick(brick->get_body());  break;
-        case SPLIT:  draw_split_brick(brick->get_body()); break;
-        default:                                           break;
+
+        case BALL:
+            draw_ball_brick(brick->getBody());
+            break;
+
+        case SPLIT:
+            draw_split_brick(brick->getBody());
+            break;
+
+        default:
+            break;
         }
     }
+
+    for (Ball const& ball : game.get_balls())
+    {
+        draw_ball(ball.getBody());
+    }
+
+    draw_paddle(game.get_paddle().getArc());
 }
 
 void My_window::set_mouse_controller()
@@ -420,7 +406,6 @@ void My_window::set_mouse_controller()
 
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
-    if (!arena_visible || game.is_finished()) return;
     if (game.get_balls().empty() && game.get_lives() > 0) {
         game.add_ball_on_paddle();
         update_infos();
@@ -430,12 +415,12 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    // conversion des coordonnées de la fenêtre aux coordonnées de l'arène
+    //convertion des coordonnées de la fenêtre aux coordonnées de l'arène
     double width = drawing.get_width();
     double height = drawing.get_height();
     double side = min(width, height);
 
-    // seule la zone carrée du canvas est utilisée pour l'arène
+    //prise en compte uniquement de la partie drawing et consacré a l'arrène
     double arena_x = (x - (width - side) / 2.0) * arena_size / side;
 
     game.set_paddle_target(arena_x);

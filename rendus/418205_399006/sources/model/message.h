@@ -2,7 +2,7 @@
 //              d'etat du jeu
 //
 // Auteur   : Liam Van Camp
-// Version  : 1.0 du 24.05.2026
+// Version  : 1.0 du 26.04.2026
 
 #ifndef MESSAGE_H
 #define MESSAGE_H

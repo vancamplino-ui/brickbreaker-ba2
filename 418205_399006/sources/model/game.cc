@@ -1,18 +1,19 @@
 // game.cc  : lecture du fichier de jeu et validations initiales
 //
 // Auteurs  : Liam Van Camp, Victor Henri Willy Eder
-// Version  : 1.0 du 26.04.2026
+// Version  : 1.0 du 24.05.2026
 
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 #include <utility>
 
-#include "game.h"
 #include "message.h"
 #include "../tools/tools.h"
 #include "../tools/constants.h"
+#include "game.h"
 
 namespace
 {
@@ -42,6 +43,51 @@ namespace
     void write_paddle(std::ofstream& file, Paddle const& paddle);
     void write_bricks(std::ofstream& file, std::vector<Brick*> const& bricks);
     void write_balls(std::ofstream& file, std::vector<Ball> const& balls);
+
+    // --- physique du jeu ---
+    void bounce_brick(Ball& ball, int brick_idx,
+                      std::vector<Brick*>& bricks,
+                      std::vector<Ball>& new_balls,
+                      int& score);
+    void bounce_ball(Ball& ball, Circle body, int ball_idx,
+                     std::vector<Ball>& balls,
+                     std::set<size_t>& bounced);
+    void bounce_paddle(Ball& ball, Paddle const& paddle);
+    void bounce_arena(Ball& ball, Circle body,
+                      bool hit_left, bool hit_right, bool hit_top);
+    void detect_collisions(Circle body, Ball const& ball,
+                           std::vector<Ball> const& balls,
+                           std::vector<Brick*> const& bricks,
+                           std::set<size_t> const& bounced,
+                           int& brick_idx, int& ball_idx);
+    void resolve_bounces(Ball& ball, Point old_pos,
+                         std::vector<Ball>& balls,
+                         std::vector<Brick*>& bricks,
+                         std::vector<Ball>& new_balls,
+                         Paddle const& paddle,
+                         std::set<size_t>& bounced,
+                         int& score);
+    bool move_ball(Ball& ball,
+                   std::vector<Ball>& balls,
+                   std::vector<Brick*>& bricks,
+                   std::vector<Ball>& new_balls,
+                   Paddle const& paddle,
+                   std::set<size_t>& bounced,
+                   int& score);
+    void move_balls(std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks,
+                    Paddle const& paddle,
+                    int& score);
+    void move_ball_paddle(Ball& ball,
+                          std::vector<Ball>& balls,
+                          std::vector<Brick*>& bricks,
+                          std::vector<Ball>& new_balls,
+                          Paddle const& paddle,
+                          int& score);
+    void move_balls_paddle(std::vector<Ball>& balls,
+                           std::vector<Brick*>& bricks,
+                           Paddle const& paddle,
+                           int& score);
 } // namespace
 
 Game::Game()
@@ -63,7 +109,7 @@ bool Game::bricks_intersect()
 {
     for (size_t i = 0; i < bricks.size(); ++i) {
         for (size_t j = i + 1; j < bricks.size(); ++j) {
-            if (::intersects(bricks[i]->getBody(), bricks[j]->getBody())) {
+            if (::intersects(bricks[i]->get_body(), bricks[j]->get_body())) {
                 std::cout << message::collision_bricks(i, j);
                 return true;
             }
@@ -78,7 +124,7 @@ bool Game::paddle_intersects_brick(Paddle const* tested_paddle) const
     if (tested_paddle != nullptr) paddle_to_test = tested_paddle;
 
     for (size_t i = 0; i < bricks.size(); ++i) {
-        if (::intersects(paddle_to_test->getArc(), bricks[i]->getBody())) {
+        if (::intersects(paddle_to_test->get_arc(), bricks[i]->get_body())) {
             if (tested_paddle == nullptr) {
                 std::cout << message::collision_paddle_brick(i);
             }
@@ -92,7 +138,7 @@ bool Game::balls_intersect()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = i + 1; j < balls.size(); ++j) {
-            if (::intersects(balls[i].getBody(), balls[j].getBody())) {
+            if (::intersects(balls[i].get_body(), balls[j].get_body())) {
                 std::cout << message::collision_balls(i, j);
                 return true;
             }
@@ -105,7 +151,7 @@ bool Game::ball_intersects_brick()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = 0; j < bricks.size(); ++j) {
-            if (::intersects(balls[i].getBody(), bricks[j]->getBody())) {
+            if (::intersects(balls[i].get_body(), bricks[j]->get_body())) {
                 std::cout << message::collision_ball_brick(i, j);
                 return true;
             }
@@ -117,14 +163,13 @@ bool Game::ball_intersects_brick()
 bool Game::paddle_intersects_ball()
 {
     for (size_t i = 0; i < balls.size(); ++i) {
-        if (::intersects(paddle.getArc(), balls[i].getBody())) {
+        if (::intersects(paddle.get_arc(), balls[i].get_body())) {
             std::cout << message::collision_paddle_ball(i);
             return true;
         }
     }
     return false;
 }
-
 
 bool Game::load(std::string const& filename)
 {
@@ -169,11 +214,6 @@ void Game::save(std::string const& filename) const
     write_paddle(file, paddle);
     write_bricks(file, bricks);
     write_balls(file, balls);
-}
-
-void Game::update()
-{
-    move_paddle_to(paddle.get_target_mouse());
 }
 
 bool Game::is_finished() const
@@ -232,7 +272,7 @@ void Game::set_paddle_target(double x)
 
 void Game::move_paddle_to(double x)
 {
-    double current_x = paddle.getArc().center.x;
+    double current_x = paddle.get_arc().center.x;
     double dx = x - current_x;
     double new_x = x;
 
@@ -251,12 +291,26 @@ void Game::move_paddle_to(double x)
 
 void Game::add_ball_on_paddle()
 {
-    double top_x = paddle.getArc().center.x;
-    double top_y = paddle.getArc().center.y + paddle.getArc().radius;
+    double top_x = paddle.get_arc().center.x;
+    double top_y = paddle.get_arc().center.y + paddle.get_arc().radius;
     balls.push_back(Ball({{top_x, top_y + new_ball_radius + epsil_zero},
                            new_ball_radius},
                          {0.0, new_ball_delta_norm}));
     --lives;
+}
+
+void Game::update()
+{
+    if (is_finished()) return;
+    move_balls(balls, bricks, paddle, score);
+    move_paddle_to(paddle.get_target_mouse());
+    move_balls_paddle(balls, bricks, paddle, score);
+    if (is_won()) {
+        score += static_cast<int>(score_per_life) * lives;
+        std::cout << message::won();
+    } else if (is_lost()) {
+        std::cout << message::lost();
+    }
 }
 
 namespace
@@ -301,7 +355,6 @@ namespace
         for (Brick* brick : bricks) {
             delete brick;
         }
-
         bricks.clear();
     }
 
@@ -313,7 +366,6 @@ namespace
             std::cout << message::invalid_score(score);
             return false;
         }
-
         return true;
     }
 
@@ -507,7 +559,7 @@ namespace
 
     void write_paddle(std::ofstream& file, Paddle const& paddle)
     {
-        Circle paddle_arc = paddle.getArc();
+        Circle paddle_arc = paddle.get_arc();
 
         file << "# paddle\n";
         file << paddle_arc.center.x << ' '
@@ -521,20 +573,20 @@ namespace
         file << bricks.size() << '\n';
 
         for (Brick const* brick : bricks) {
-            Square body = brick->getBody();
+            Square body = brick->get_body();
             double size = 2.0 * body.half_size;
 
-            file << brick->getType() << ' '
+            file << brick->get_type() << ' '
                  << body.center.x << ' '
                  << body.center.y << ' '
                  << size;
 
-            if (brick->getType() == RAINBOW) {
+            if (brick->get_type() == RAINBOW) {
                 RainbowBrick const* rainbow =
                     dynamic_cast<RainbowBrick const*>(brick);
 
                 if (rainbow != nullptr) {
-                    file << ' ' << rainbow->getHitPoints();
+                    file << ' ' << rainbow->get_hit_points();
                 }
             }
 
@@ -548,8 +600,8 @@ namespace
         file << balls.size() << '\n';
 
         for (Ball const& ball : balls) {
-            Circle body = ball.getBody();
-            Point delta = ball.getDelta();
+            Circle body = ball.get_body();
+            Point delta = ball.get_delta();
 
             file << body.center.x << ' '
                  << body.center.y << ' '
@@ -558,4 +610,262 @@ namespace
                  << delta.y << '\n';
         }
     }
+
+    // === Physique du jeu ===
+
+    void bounce_brick(Ball& ball, int brick_idx,
+                      std::vector<Brick*>& bricks,
+                      std::vector<Ball>& new_balls,
+                      int& score)
+    {
+        Square sq = bricks[brick_idx]->get_body();
+        Point diff = sq.center - ball.get_body().center;
+        Point diff_borne = {
+            std::clamp(diff.x, -sq.half_size, sq.half_size),
+            std::clamp(diff.y, -sq.half_size, sq.half_size)
+        };
+        Point dir_nom = diff - diff_borne;
+        Point n;
+        if (norm(dir_nom) >= epsil_zero) {
+            n = normalized(dir_nom);
+        } else {
+            n = {0.0, 0.0};
+            if (std::abs(diff.x) > std::abs(diff.y))
+                n.x = (diff.x > 0) ? 1.0 : -1.0;
+            else
+                n.y = (diff.y > 0) ? 1.0 : -1.0;
+        }
+        double v_n = dot(ball.get_delta(), n);
+        Point old_delta = ball.get_delta();
+        ball.set_delta(old_delta - n * (2.0 * v_n));
+        BrickType brick_type = bricks[brick_idx]->get_type();
+        Point brick_center   = bricks[brick_idx]->get_body().center;
+        std::vector<Brick*> new_bricks;
+        bool destroyed = bricks[brick_idx]->hit(new_bricks);
+        score += score_per_hit;
+        if (destroyed) {
+            if (brick_type == BALL)
+                new_balls.push_back(Ball({brick_center, new_ball_radius}, old_delta));
+            delete bricks[brick_idx];
+            bricks.erase(bricks.begin() + brick_idx);
+        }
+        for (Brick* b : new_bricks)
+            bricks.push_back(b);
+    }
+
+    void bounce_ball(Ball& ball, Circle body, int ball_idx,
+                     std::vector<Ball>& balls,
+                     std::set<size_t>& bounced)
+    {
+        Circle cj   = balls[ball_idx].get_body();
+        Point axis  = normalized(cj.center - body.center);
+        double v_n  = dot(ball.get_delta(), axis);
+        double v_nj = dot(balls[ball_idx].get_delta(), axis);
+        double ri   = body.radius;
+        double rj   = cj.radius;
+
+        double fi = 2.0 * rj * rj / (ri * ri + rj * rj);
+        Point new_di = ball.get_delta() + axis * ((-v_n + v_nj) * fi);
+        double ni = norm(new_di);
+        if (ni > delta_norm_max) new_di = new_di * (delta_norm_max / ni);
+        ball.set_delta(new_di);
+
+        double fj = 2.0 * ri * ri / (ri * ri + rj * rj);
+        Point new_dj = balls[ball_idx].get_delta() + axis * ((v_n - v_nj) * fj);
+        double nj = norm(new_dj);
+        if (nj > delta_norm_max) new_dj = new_dj * (delta_norm_max / nj);
+        balls[ball_idx].set_delta(new_dj);
+
+        bounced.insert(static_cast<size_t>(ball_idx));
+    }
+
+    void bounce_paddle(Ball& ball, Paddle const& paddle)
+    {
+        Circle ball_body  = ball.get_body();
+        Circle paddle_arc = paddle.get_arc();
+        Point axis  = normalized(ball_body.center - paddle_arc.center);
+        double v_n  = dot(ball.get_delta(), axis);
+        double v_nj = dot(paddle.get_delta(), axis);
+        Point new_delta = ball.get_delta() + axis * ((-v_n + v_nj) * 2.0);
+        if (new_delta.y < 0.0) new_delta.y = -new_delta.y;
+        double n = norm(new_delta);
+        if (n > delta_norm_max) new_delta = new_delta * (delta_norm_max / n);
+        ball.set_delta(new_delta);
+    }
+
+    void bounce_arena(Ball& ball, Circle body,
+                      bool hit_left, bool hit_right, bool hit_top)
+    {
+        if ((hit_left || hit_right) && hit_top) {
+            double dist_x = std::max(
+                body.radius - body.center.x,
+                body.center.x + body.radius - arena_size);
+            double dist_y = body.center.y + body.radius - arena_size;
+            if (dist_x > dist_y) hit_top = false;
+            else { hit_left = false; hit_right = false; }
+        }
+        Point delta = ball.get_delta();
+        if (hit_left || hit_right) delta.x = -delta.x;
+        if (hit_top)               delta.y = -delta.y;
+        ball.set_delta(delta);
+    }
+
+    void detect_collisions(Circle body, Ball const& ball,
+                           std::vector<Ball> const& balls,
+                           std::vector<Brick*> const& bricks,
+                           std::set<size_t> const& bounced,
+                           int& brick_idx, int& ball_idx)
+    {
+        brick_idx = -1;
+        for (size_t j = 0; j < bricks.size(); ++j)
+            if (intersects(body, bricks[j]->get_body(), epsil_zero)) {
+                brick_idx = static_cast<int>(j);
+                break;
+            }
+
+        ball_idx = -1;
+        for (size_t j = 0; j < balls.size(); ++j) {
+            if (&balls[j] == &ball) continue;
+            if (bounced.count(j)) continue;  // déjà mis à jour symétriquement
+            if (intersects(body, balls[j].get_body(), epsil_zero)) {
+                ball_idx = static_cast<int>(j);
+                break;
+            }
+        }
+    }
+
+    // Boucle de rebonds partagée (Phase 1 et Phase 3).
+    void resolve_bounces(Ball& ball, Point old_pos,
+                         std::vector<Ball>& balls,
+                         std::vector<Brick*>& bricks,
+                         std::vector<Ball>& new_balls,
+                         Paddle const& paddle,
+                         std::set<size_t>& bounced,
+                         int& score)
+    {
+        unsigned nb_rebonds = 0;
+        bool paddle_bounced = false;
+
+        while (nb_rebonds < nb_bounce_max) {
+            Circle body = ball.get_body();
+            bool hit_left   = (body.center.x - body.radius < epsil_zero);
+            bool hit_right  = (body.center.x + body.radius > arena_size - epsil_zero);
+            bool hit_top    = (body.center.y + body.radius > arena_size - epsil_zero);
+            bool hit_paddle = !paddle_bounced
+                              && intersects(paddle.get_arc(), body, epsil_zero);
+            int brick_idx = -1;
+            int ball_idx  = -1;
+            detect_collisions(body, ball, balls, bricks, bounced, brick_idx, ball_idx);
+
+            if (!hit_left && !hit_right && !hit_top && !hit_paddle
+                && brick_idx < 0 && ball_idx < 0) break;
+
+            ball.translate(old_pos - ball.get_body().center);
+            ++nb_rebonds;
+
+            if (brick_idx >= 0)
+                bounce_brick(ball, brick_idx, bricks, new_balls, score);
+            else if (ball_idx >= 0)
+                bounce_ball(ball, body, ball_idx, balls, bounced);
+            else if (hit_paddle) {
+                bounce_paddle(ball, paddle);
+                paddle_bounced = true;
+            } else
+                bounce_arena(ball, body, hit_left, hit_right, hit_top);
+
+            old_pos = ball.get_body().center;
+            ball.translate(ball.get_delta());
+        }
+    }
+
+    // Phase 1 : déplace une balle et gère ses rebonds.
+    // Retourne true si la balle est tombée sous le bord inférieur.
+    bool move_ball(Ball& ball,
+                   std::vector<Ball>& balls,
+                   std::vector<Brick*>& bricks,
+                   std::vector<Ball>& new_balls,
+                   Paddle const& paddle,
+                   std::set<size_t>& bounced,
+                   int& score)
+    {
+        Point old_pos = ball.get_body().center;
+        ball.translate(ball.get_delta());
+        if (ball.get_body().center.y < 0.0)
+            return true;
+
+        resolve_bounces(ball, old_pos, balls, bricks,
+                        new_balls, paddle, bounced, score);
+        return false;
+    }
+
+    // Phase 1 : déplace toutes les balles et supprime celles tombées.
+    void move_balls(std::vector<Ball>& balls,
+                    std::vector<Brick*>& bricks,
+                    Paddle const& paddle,
+                    int& score)
+    {
+        std::vector<Ball> new_balls;
+        std::vector<size_t> to_remove;
+        std::set<size_t> bounced;
+
+        for (size_t i = 0; i < balls.size(); ++i) {
+            if (move_ball(balls[i], balls, bricks, new_balls, paddle, bounced, score))
+                to_remove.push_back(i);
+        }
+
+        for (int k = static_cast<int>(to_remove.size()) - 1; k >= 0; --k)
+            balls.erase(balls.begin() + to_remove[k]);
+
+        for (Ball& b : new_balls)
+            balls.push_back(b);
+    }
+
+    // Phase 3 : rebond raquette (hors nb_rebonds) puis rebonds suivants.
+    void move_ball_paddle(Ball& ball,
+                          std::vector<Ball>& balls,
+                          std::vector<Brick*>& bricks,
+                          std::vector<Ball>& new_balls,
+                          Paddle const& paddle,
+                          int& score)
+    {
+        if (!intersects(paddle.get_arc(), ball.get_body(), epsil_zero))
+            return;
+
+        bounce_paddle(ball, paddle);  // pas compté dans nb_rebonds
+
+        // Dépénétration : sortir la balle hors de la zone eps du paddle
+        // pour éviter qu'un 2e rebond paddle s'enclenche dans resolve_bounces.
+        {
+            Circle bd    = ball.get_body();
+            Circle pa    = paddle.get_arc();
+            double d     = distance(bd.center, pa.center);
+            double limit = bd.radius + pa.radius + epsil_zero;
+            if (d < limit) {
+                Point ax = (d > epsil_zero) ? normalized(bd.center - pa.center)
+                                            : Point{0.0, 1.0};
+                ball.translate(ax * (limit - d));
+            }
+        }
+
+        Point old_pos = ball.get_body().center;
+        ball.translate(ball.get_delta());
+
+        std::set<size_t> bounced;
+        resolve_bounces(ball, old_pos, balls, bricks,
+                        new_balls, paddle, bounced, score);
+    }
+
+    // Phase 3 : applique move_ball_paddle sur toutes les balles.
+    void move_balls_paddle(std::vector<Ball>& balls,
+                           std::vector<Brick*>& bricks,
+                           Paddle const& paddle,
+                           int& score)
+    {
+        std::vector<Ball> new_balls;
+        for (Ball& ball : balls)
+            move_ball_paddle(ball, balls, bricks, new_balls, paddle, score);
+        for (Ball& b : new_balls)
+            balls.push_back(b);
+    }
+
 } // namespace
